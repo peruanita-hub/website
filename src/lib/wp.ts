@@ -68,7 +68,16 @@ export interface Page {
  * pool saturado y volver con una página de error en vez de JSON. Se
  * reintenta antes de fallar el build entero por eso.
  */
-async function wpFetch<T>(path: string, intentos = 6): Promise<T> {
+/**
+ * Varias páginas piden el mismo listado (ej. catálogo y ficha de
+ * producto llaman a getProductos() cada una) — sin esto, cada una
+ * dispara su propia request en paralelo contra el mismo pool chico de
+ * PHP-FPM. Se cachea por path: una sola request real por build, todas
+ * las llamadas que sigan la reciben servida.
+ */
+const cache = new Map<string, Promise<unknown>>();
+
+async function wpFetchSinCache<T>(path: string, intentos = 6): Promise<T> {
   for (let intento = 1; intento <= intentos; intento++) {
     try {
       const res = await fetch(`${WP_URL}${path}`);
@@ -84,6 +93,19 @@ async function wpFetch<T>(path: string, intentos = 6): Promise<T> {
     }
   }
   throw new Error('inalcanzable');
+}
+
+function wpFetch<T>(path: string): Promise<T> {
+  if (!cache.has(path)) {
+    cache.set(
+      path,
+      wpFetchSinCache<T>(path).catch((err) => {
+        cache.delete(path);
+        throw err;
+      })
+    );
+  }
+  return cache.get(path) as Promise<T>;
 }
 
 export function getProductos() {
