@@ -161,6 +161,7 @@ function activo(item: (typeof nav)[number]) {
   id="menu-movil"
   aria-label="Menú de navegación"
   aria-hidden="true"
+  inert
   class="fixed inset-y-0 right-0 z-50 flex w-[min(22rem,90vw)] flex-col bg-crema-50 shadow-2xl lg:hidden"
 >
   <div class="relative flex items-center justify-between overflow-hidden border-b border-border bg-crema-100 px-5 py-4">
@@ -192,7 +193,7 @@ function activo(item: (typeof nav)[number]) {
         <li class="menu-item opacity-0" style={`--delay:${70 + i * 50}ms`}>
           {'hijos' in item ? (
             <div class="mt-2 border-t border-border pt-4">
-              <p class="px-3 pb-2 text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground/70">
+              <p class="px-3 pb-2 text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground/80">
                 {item.label}
               </p>
               <ul class="space-y-1">
@@ -522,6 +523,7 @@ function activo(item: (typeof nav)[number]) {
       panel!.setAttribute('data-open', '');
       overlay!.setAttribute('data-open', '');
       panel!.setAttribute('aria-hidden', 'false');
+      panel!.removeAttribute('inert');
       abrirBtn!.setAttribute('aria-expanded', 'true');
       document.body.style.overflow = 'hidden';
       cerrarBtn!.focus();
@@ -531,6 +533,7 @@ function activo(item: (typeof nav)[number]) {
       panel!.removeAttribute('data-open');
       overlay!.removeAttribute('data-open');
       panel!.setAttribute('aria-hidden', 'true');
+      panel!.setAttribute('inert', '');
       abrirBtn!.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
     }

@@ -216,13 +216,15 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
       </svg>
     </button>
 
-    <div class="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-2.5">
+    <div class="absolute bottom-1 left-1/2 z-10 flex -translate-x-1/2">
       {slides.map((_, i) => (
         <button
           type="button"
-          class="hero-dot h-2.5 w-2.5 rounded-full bg-white/60 transition-all hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          class="hero-dot-hit flex h-7 w-7 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           aria-label={`Ir a la diapositiva ${i + 1}`}
-        />
+        >
+          <span class="hero-dot block h-2.5 w-2.5 rounded-full bg-white/60 transition-all" />
+        </button>
       ))}
     </div>
   </div>
@@ -270,6 +272,10 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
       transform 700ms cubic-bezier(0.45, 0, 0.25, 1.05) var(--delay);
   }
 
+  .hero-dot-hit:hover .hero-dot {
+    background-color: #fff;
+  }
+
   .hero-dot[data-active] {
     width: 1.75rem;
     background-color: #fff;
@@ -293,6 +299,7 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
     if (!root) return;
 
     const slides = Array.from(root.querySelectorAll<HTMLElement>('.hero-slide'));
+    const dotButtons = Array.from(root.querySelectorAll<HTMLElement>('.hero-dot-hit'));
     const dots = Array.from(root.querySelectorAll<HTMLElement>('.hero-dot'));
     const prev = root.querySelector<HTMLButtonElement>('.hero-prev');
     const next = root.querySelector<HTMLButtonElement>('.hero-next');
@@ -330,7 +337,7 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
       start();
     }
 
-    dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
+    dotButtons.forEach((btn, i) => btn.addEventListener('click', () => goTo(i)));
     prev?.addEventListener('click', () => goTo(current - 1));
     next?.addEventListener('click', () => goTo(current + 1));
 
