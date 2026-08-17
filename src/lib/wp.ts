@@ -68,7 +68,7 @@ export interface Page {
  * pool saturado y volver con una página de error en vez de JSON. Se
  * reintenta antes de fallar el build entero por eso.
  */
-async function wpFetch<T>(path: string, intentos = 3): Promise<T> {
+async function wpFetch<T>(path: string, intentos = 6): Promise<T> {
   for (let intento = 1; intento <= intentos; intento++) {
     try {
       const res = await fetch(`${WP_URL}${path}`);
@@ -80,7 +80,7 @@ async function wpFetch<T>(path: string, intentos = 3): Promise<T> {
       if (intento === intentos) {
         throw new Error(`WP REST ${path} falló tras ${intentos} intentos: ${err}`);
       }
-      await new Promise((r) => setTimeout(r, 500 * intento));
+      await new Promise((r) => setTimeout(r, 800 * intento));
     }
   }
   throw new Error('inalcanzable');
