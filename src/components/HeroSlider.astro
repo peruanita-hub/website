@@ -12,13 +12,34 @@
  *
  * Nativo: CSS + ~50 líneas de JS. El original usaba Slider Revolution.
  */
-const slides = [
+interface Layer {
+  src: string;
+  srcSmall?: string;
+  smallWidth?: number;
+  fullWidth?: number;
+  anim: 'up' | 'pop' | 'drop';
+  delay: number;
+  wrapper?: string;
+  img?: string;
+  pos?: { x: number; y: number; w: number };
+}
+
+const slides: {
+  bg?: string;
+  bgSmall?: string;
+  alt?: string;
+  heading?: string;
+  stage?: { w: number; h: number };
+  layers: Layer[];
+}[] = [
   {
     bg: '/legacy/Slider_1_bg_1.webp',
+    bgSmall: '/legacy/Slider_1_bg_1-960.webp',
     alt: 'Línea completa de productos Maxifort sobre campo de trigo',
     layers: [
       {
         src: '/legacy/slider_1_bg.webp',
+        srcSmall: '/legacy/slider_1_bg-960.webp',
         anim: 'up',
         delay: 120,
         // Piso de madera: franja inferior, ancho completo.
@@ -27,6 +48,9 @@ const slides = [
       },
       {
         src: '/legacy/products.webp',
+        srcSmall: '/legacy/products-820.webp',
+        smallWidth: 820,
+        fullWidth: 1634,
         anim: 'pop',
         delay: 520,
         // Los productos se apoyan sobre el piso: base al 17% desde abajo.
@@ -118,6 +142,8 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
       >
         <img
           src={slide.bg}
+          srcset={slide.bgSmall ? `${slide.bgSmall} 960w, ${slide.bg} 1920w` : undefined}
+          sizes={slide.bgSmall ? '100vw' : undefined}
           alt={i === 0 ? slide.alt : ''}
           loading={i === 0 ? 'eager' : 'lazy'}
           fetchpriority={i === 0 ? 'high' : undefined}
@@ -135,7 +161,7 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
                 alt=""
                 loading="lazy"
                 data-anim={layer.anim}
-                style={`${toPercent(layer.pos, slide.stage)};--delay:${layer.delay}ms`}
+                style={`${toPercent(layer.pos!, slide.stage!)};--delay:${layer.delay}ms`}
                 class="hero-layer absolute"
               />
             ))}
@@ -145,8 +171,10 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
             <div class={layer.wrapper}>
               <img
                 src={layer.src}
+                srcset={layer.srcSmall ? `${layer.srcSmall} ${layer.smallWidth ?? 960}w, ${layer.src} ${layer.fullWidth ?? 1920}w` : undefined}
+                sizes={layer.srcSmall ? '86vw' : undefined}
                 alt=""
-                loading="lazy"
+                loading={i === 0 ? 'eager' : 'lazy'}
                 data-anim={layer.anim}
                 style={`--delay:${layer.delay}ms`}
                 class={`hero-layer ${layer.img}`}

@@ -88,7 +88,7 @@ import ContactRow from '../components/ui/ContactRow.astro';
         <form method="POST" action="/api/contacto" enctype="multipart/form-data">
           <input type="hidden" name="formulario" value="postulacion" />
           {/* Honeypot: los bots rellenan todo; las personas no lo ven. */}
-          <div class="sr-only" aria-hidden="true">
+          <div class="sr-only">
             <label>No llenar<input name="website" tabindex="-1" autocomplete="off" /></label>
           </div>
 
