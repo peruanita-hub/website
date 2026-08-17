@@ -63,21 +63,19 @@ export interface Page {
 }
 
 /**
- * El hosting de origen tiene un pool de PHP-FPM chico; en builds que
- * disparan varias páginas a la vez alguna request puede toparse con el
- * pool saturado y volver con una página de error en vez de JSON. Se
- * reintenta antes de fallar el build entero por eso.
- */
-/**
- * Varias páginas piden el mismo listado (ej. catálogo y ficha de
- * producto llaman a getProductos() cada una) — sin esto, cada una
- * dispara su propia request en paralelo contra el mismo pool chico de
- * PHP-FPM. Se cachea por path: una sola request real por build, todas
- * las llamadas que sigan la reciben servida.
+ * El origen falla intermitentemente para requests que vienen desde la
+ * infraestructura de build de Cloudflare (funciona siempre desde otras
+ * IPs) — reintenta antes de fallar el build entero por eso.
+ *
+ * Además: varias páginas piden el mismo listado (ej. catálogo y ficha
+ * de producto llaman a getProductos() cada una) — sin caché, cada una
+ * dispara su propia request en paralelo. Se cachea por path: una sola
+ * request real por build, todas las llamadas que sigan la reciben
+ * servida.
  */
 const cache = new Map<string, Promise<unknown>>();
 
-async function wpFetchSinCache<T>(path: string, intentos = 6): Promise<T> {
+async function wpFetchSinCache<T>(path: string, intentos = 12): Promise<T> {
   for (let intento = 1; intento <= intentos; intento++) {
     try {
       const res = await fetch(`${WP_URL}${path}`);
@@ -89,7 +87,9 @@ async function wpFetchSinCache<T>(path: string, intentos = 6): Promise<T> {
       if (intento === intentos) {
         throw new Error(`WP REST ${path} falló tras ${intentos} intentos: ${err}`);
       }
-      await new Promise((r) => setTimeout(r, 800 * intento));
+      // Los cortes vistos en producción duraron ~13s seguidos: con
+      // menos margen los reintentos se agotaban dentro del mismo corte.
+      await new Promise((r) => setTimeout(r, 3000));
     }
   }
   throw new Error('inalcanzable');
