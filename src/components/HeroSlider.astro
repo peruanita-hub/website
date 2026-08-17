@@ -17,6 +17,8 @@ interface Layer {
   srcSmall?: string;
   smallWidth?: number;
   fullWidth?: number;
+  w: number;
+  h: number;
   anim: 'up' | 'pop' | 'drop';
   delay: number;
   wrapper?: string;
@@ -27,6 +29,8 @@ interface Layer {
 const slides: {
   bg?: string;
   bgSmall?: string;
+  bgW?: number;
+  bgH?: number;
   alt?: string;
   heading?: string;
   stage?: { w: number; h: number };
@@ -35,11 +39,15 @@ const slides: {
   {
     bg: '/legacy/Slider_1_bg_1.webp',
     bgSmall: '/legacy/Slider_1_bg_1-960.webp',
+    bgW: 1920,
+    bgH: 902,
     alt: 'Línea completa de productos Maxifort sobre campo de trigo',
     layers: [
       {
         src: '/legacy/slider_1_bg.webp',
         srcSmall: '/legacy/slider_1_bg-960.webp',
+        w: 1920,
+        h: 377,
         anim: 'up',
         delay: 120,
         // Piso de madera: franja inferior, ancho completo.
@@ -51,6 +59,8 @@ const slides: {
         srcSmall: '/legacy/products-820.webp',
         smallWidth: 820,
         fullWidth: 1634,
+        w: 1634,
+        h: 431,
         anim: 'pop',
         delay: 520,
         // Los productos se apoyan sobre el piso: base al 17% desde abajo.
@@ -61,11 +71,19 @@ const slides: {
   },
   {
     bg: '/legacy/slider_2_bg.webp',
+    bgSmall: '/legacy/slider_2_bg-960.webp',
+    bgW: 1920,
+    bgH: 912,
     alt: 'Productos para programas sociales sobre tablones de madera',
     heading: 'Alimentos para programas sociales',
     layers: [
       {
         src: '/legacy/slider_2_woo.webp',
+        srcSmall: '/legacy/slider_2_woo-960.webp',
+        smallWidth: 960,
+        fullWidth: 1920,
+        w: 1920,
+        h: 452,
         anim: 'up',
         delay: 120,
         wrapper: 'absolute inset-x-0 bottom-0 h-[38%]',
@@ -73,6 +91,11 @@ const slides: {
       },
       {
         src: '/legacy/product-2.webp',
+        srcSmall: '/legacy/product-2-800.webp',
+        smallWidth: 800,
+        fullWidth: 1183,
+        w: 1183,
+        h: 545,
         anim: 'pop',
         delay: 520,
         wrapper: 'absolute bottom-[25%] left-1/2 w-[80%] -translate-x-1/2 md:w-[57%]',
@@ -82,6 +105,9 @@ const slides: {
   },
   {
     bg: '/legacy/slider_3_bg_2.webp',
+    bgSmall: '/legacy/slider_3_bg_2-960.webp',
+    bgW: 1920,
+    bgH: 996,
     alt: 'Kiwicha y Quinua Instantánea cayendo en chocolate',
     // Este slide usa las coordenadas exactas del diseño original, sobre
     // el mismo lienzo de 1920x900 que usaba Slider Revolution. Es la
@@ -93,18 +119,33 @@ const slides: {
     layers: [
       {
         src: '/legacy/Slider_3_splash_back.webp',
+        srcSmall: '/legacy/Slider_3_splash_back-700.webp',
+        smallWidth: 700,
+        fullWidth: 1234,
+        w: 1234,
+        h: 859,
         anim: 'up',
         delay: 620,
         pos: { x: 659, y: 212, w: 1234 },
       },
       {
         src: '/legacy/Slider_3_product.webp',
+        srcSmall: '/legacy/Slider_3_product-380.webp',
+        smallWidth: 380,
+        fullWidth: 511,
+        w: 511,
+        h: 676,
         anim: 'drop',
         delay: 120,
         pos: { x: 978, y: 92, w: 511 },
       },
       {
         src: '/legacy/Slider_3_splash_front.webp',
+        srcSmall: '/legacy/Slider_3_splash_front-550.webp',
+        smallWidth: 550,
+        fullWidth: 834,
+        w: 834,
+        h: 470,
         anim: 'up',
         delay: 720,
         pos: { x: 862, y: 382, w: 834 },
@@ -144,6 +185,8 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
           src={slide.bg}
           srcset={slide.bgSmall ? `${slide.bgSmall} 960w, ${slide.bg} 1920w` : undefined}
           sizes={slide.bgSmall ? '100vw' : undefined}
+          width={slide.bgW}
+          height={slide.bgH}
           alt={i === 0 ? slide.alt : ''}
           loading={i === 0 ? 'eager' : 'lazy'}
           fetchpriority={i === 0 ? 'high' : undefined}
@@ -158,6 +201,10 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
             {slide.layers.map((layer) => (
               <img
                 src={layer.src}
+                srcset={layer.srcSmall ? `${layer.srcSmall} ${layer.smallWidth ?? 960}w, ${layer.src} ${layer.fullWidth ?? 1920}w` : undefined}
+                sizes={layer.srcSmall ? '40vw' : undefined}
+                width={layer.w}
+                height={layer.h}
                 alt=""
                 loading="lazy"
                 data-anim={layer.anim}
@@ -173,6 +220,8 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
                 src={layer.src}
                 srcset={layer.srcSmall ? `${layer.srcSmall} ${layer.smallWidth ?? 960}w, ${layer.src} ${layer.fullWidth ?? 1920}w` : undefined}
                 sizes={layer.srcSmall ? '86vw' : undefined}
+                width={layer.w}
+                height={layer.h}
                 alt=""
                 loading={i === 0 ? 'eager' : 'lazy'}
                 data-anim={layer.anim}
@@ -223,7 +272,7 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
           class="hero-dot-hit flex h-7 w-7 items-center justify-center focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           aria-label={`Ir a la diapositiva ${i + 1}`}
         >
-          <span class="hero-dot block h-2.5 w-2.5 rounded-full bg-white/60 transition-all" />
+          <span class="hero-dot block rounded-full bg-white/60" />
         </button>
       ))}
     </div>
@@ -272,12 +321,28 @@ function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number;
       transform 700ms cubic-bezier(0.45, 0, 0.25, 1.05) var(--delay);
   }
 
+  /*
+    Antes se animaba `width` (10px -> 28px): Lighthouse lo marca como
+    animación no compuesta porque dispara layout. El punto ahora tiene
+    ancho fijo de 28px siempre y se comprime con scaleX desde el borde
+    izquierdo — visualmente idéntico, pero solo transform, compositado.
+  */
+  .hero-dot {
+    width: 1.75rem;
+    height: 0.625rem;
+    transform-origin: left center;
+    transform: scaleX(0.357);
+    transition:
+      transform 250ms ease,
+      background-color 250ms ease;
+  }
+
   .hero-dot-hit:hover .hero-dot {
     background-color: #fff;
   }
 
   .hero-dot[data-active] {
-    width: 1.75rem;
+    transform: scaleX(1);
     background-color: #fff;
   }
 

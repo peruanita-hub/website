@@ -1,0 +1,38 @@
+---
+/**
+ * Bloque de subrayado — reemplaza el Highlighter de React/rough-notation
+ * (180KB de JS para 2 animaciones que Lighthouse marcaba como no
+ * compuestas). Esto es puro CSS: permanente, sin animación, sin JS.
+ */
+interface Props {
+  color?: string;
+  class?: string;
+}
+
+const { color = '#F28B82', class: className } = Astro.props;
+---
+
+<span class:list={['subrayado', className]} style={`--subrayado-color:${color}`}>
+  <slot />
+</span>
+
+<style>
+  /*
+    background-image en vez de un ::after: un pseudo-elemento no se repite
+    por línea, así que en títulos de dos líneas solo marcaba la última.
+    Con box-decoration-break: clone, cada línea envuelta es su propia caja
+    y el fondo se recalcula (y se repite) en cada una por separado.
+
+    La franja va en unidades em: así se achica sola en h2/h3 en vez de
+    quedar despegada del texto como pasaba con el offset fijo en px.
+  */
+  .subrayado {
+    display: inline;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    background-image: linear-gradient(var(--subrayado-color), var(--subrayado-color));
+    background-repeat: no-repeat;
+    background-size: 100% 0.2em;
+    background-position: 0.3em calc(100% - 0.1em);
+  }
+</style>

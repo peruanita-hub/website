@@ -5,7 +5,7 @@ import SiteFooter from '../../components/SiteFooter.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import Button from '../../components/ui/Button.astro';
-import { Highlighter } from '../../components/ui/Highlighter';
+import Subrayado from '../../components/ui/Subrayado.astro';
 import Icon from '../../components/ui/Icon.astro';
 import Reveal from '../../components/ui/Reveal.astro';
 import Watermark from '../../components/Watermark.astro';
@@ -86,9 +86,9 @@ const productSchema = {
 
         <div>
         <h1 class="font-display text-3xl leading-tight text-foreground md:text-4xl">
-          <Highlighter client:visible action="underline" color="#C4160F" strokeWidth={4}>
+          <Subrayado color="#F28B82">
             {producto.title.rendered}
-          </Highlighter>
+          </Subrayado>
         </h1>
 
         {producto.meta.descripcion_corta && (

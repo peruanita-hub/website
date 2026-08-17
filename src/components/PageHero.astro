@@ -1,6 +1,6 @@
 ---
 import Breadcrumb from './ui/Breadcrumb.astro';
-import { Highlighter } from './ui/Highlighter';
+import Subrayado from './ui/Subrayado.astro';
 
 /**
  * Cabecera de página interna: migas y título centrado, con el subrayado
@@ -44,12 +44,9 @@ const { title, bg = '/legacy/Product_bg.webp', light = true, breadcrumbs = [] }:
           light ? 'text-tinta-900' : 'text-white'
         }`}
       >
-        <Highlighter client:visible action="underline"
-          color={light ? '#C4160F' : '#F7B30B'}
-          strokeWidth={5}
-        >
+        <Subrayado color={light ? '#F28B82' : '#F7B30B'}>
           {title}
-        </Highlighter>
+        </Subrayado>
       </h1>
     </div>
   </div>

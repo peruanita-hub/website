@@ -4,7 +4,7 @@ import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import PageHero from '../components/PageHero.astro';
 import Watermark from '../components/Watermark.astro';
-import { Highlighter } from '../components/ui/Highlighter';
+import Subrayado from '../components/ui/Subrayado.astro';
 import Reveal from '../components/ui/Reveal.astro';
 import Card from '../components/ui/Card.astro';
 import Button from '../components/ui/Button.astro';
@@ -64,9 +64,9 @@ const campana = [
           class="h-16 w-auto object-contain"
         />
         <h2 class="mt-6 font-display text-3xl leading-tight text-foreground md:text-4xl">
-          <Highlighter client:visible action="underline" color="#C4160F" strokeWidth={4}>
+          <Subrayado color="#F7B30B">
             Alimentamos escuelas de todo el país
-          </Highlighter>
+          </Subrayado>
         </h2>
         <p class="mt-8 text-lg leading-relaxed text-muted-foreground">
           Peruanita E.I.R.L. brinda para el programa Wasi Mikuna alimentos ricos, variados y
@@ -95,9 +95,9 @@ const campana = [
       <div class="max-w-2xl">
         <p class="text-xs uppercase tracking-[0.18em] text-primary">Qué fabricamos</p>
         <h2 class="mt-4 font-display text-2xl text-foreground md:text-3xl">
-          <Highlighter client:visible action="underline" color="#C4160F" strokeWidth={4}>
+          <Subrayado color="#F7B30B">
             Líneas para programas sociales
-          </Highlighter>
+          </Subrayado>
         </h2>
         <p class="mt-8 leading-relaxed text-muted-foreground">
           Elaboramos alimentos diseñados para atender los requerimientos de los programas sociales,
@@ -143,9 +143,9 @@ const campana = [
     <div class="relative mx-auto max-w-5xl px-6">
       <Reveal class="text-center">
         <h2 class="font-display text-2xl text-white md:text-3xl">
-          <Highlighter client:visible action="underline" color="#F7B30B" strokeWidth={4}>
+          <Subrayado color="#F7B30B">
             Programa Vaso de Leche
-          </Highlighter>
+          </Subrayado>
         </h2>
       </Reveal>
 
@@ -180,9 +180,9 @@ const campana = [
     <div class="mx-auto max-w-6xl px-6">
       <div class="text-center">
         <h2 class="font-display text-2xl text-foreground md:text-3xl">
-          <Highlighter client:visible action="underline" color="#C4160F" strokeWidth={4}>
+          <Subrayado color="#F7B30B">
             Nuestros productos
-          </Highlighter>
+          </Subrayado>
         </h2>
       </div>
 
