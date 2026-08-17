@@ -63,9 +63,13 @@ export interface Page {
 }
 
 /**
- * El origen falla intermitentemente para requests que vienen desde la
- * infraestructura de build de Cloudflare (funciona siempre desde otras
- * IPs) — reintenta antes de fallar el build entero por eso.
+ * El origen falla intermitentemente (404 o HTML en vez de JSON) durante
+ * ventanas de varios segundos, sin patrón claro de IP/cliente — se
+ * reproduce igual desde curl, Node y distintas redes. Probablemente el
+ * pool chico de PHP-FPM (10 workers) saturándose; ya se desactivó el
+ * disparo de wp-cron por request en wp-config.php como mitigación.
+ * Mientras tanto, se reintenta con margen amplio antes de fallar el
+ * build entero.
  *
  * Además: varias páginas piden el mismo listado (ej. catálogo y ficha
  * de producto llaman a getProductos() cada una) — sin caché, cada una
