@@ -1,0 +1,26 @@
+---
+import { cn } from '../../lib/utils';
+
+interface Props {
+  href?: string;
+  as?: 'div' | 'li' | 'article';
+  hoverable?: boolean;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { href, as = 'div', hoverable = false, class: className, ...rest }: Props = Astro.props;
+const Tag = href ? 'a' : as;
+---
+
+<Tag
+  href={href}
+  class={cn(
+    'block rounded-lg border border-border bg-card text-card-foreground',
+    hoverable && 'transition-shadow hover:shadow-lg',
+    className
+  )}
+  {...rest}
+>
+  <slot />
+</Tag>

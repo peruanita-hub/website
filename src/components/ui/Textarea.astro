@@ -1,0 +1,25 @@
+---
+import { cn } from '../../lib/utils';
+
+interface Props {
+  id: string;
+  name: string;
+  rows?: number;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { rows = 4, class: className, ...rest } = Astro.props;
+---
+
+<textarea
+  rows={rows}
+  class={cn(
+    'flex w-full rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground',
+    'placeholder:text-muted-foreground/60 transition-colors resize-y min-h-24',
+    'hover:border-muted-foreground/40',
+    'disabled:cursor-not-allowed disabled:opacity-50',
+    'user-invalid:border-destructive user-invalid:ring-1 user-invalid:ring-destructive',
+    className
+  )}
+  {...rest}></textarea>

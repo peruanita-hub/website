@@ -1,0 +1,572 @@
+---
+import Icon from './ui/Icon.astro';
+
+/**
+ * Navegación principal siguiendo la estructura y la semántica del
+ * NavigationMenu de shadcn/Radix: disparador con aria-expanded, panel
+ * con role="menu", cierre con Escape y foco atrapado en el panel móvil.
+ *
+ * Se implementa sin React a propósito: la cabecera aparece en las 17
+ * páginas, y React + Radix ahí costaría más que todo el JS del sitio
+ * junto. Si más adelante hace falta el paquete de shadcn tal cual, el
+ * marcado ya está preparado para el cambio.
+ */
+type Enlace = { href: string; label: string; icon: string; desc?: string };
+
+const nav: (Enlace | { label: string; icon: string; hijos: Enlace[] })[] = [
+  { href: '/la-empresa/', label: 'La empresa', icon: 'empresa' },
+  {
+    label: 'Productos',
+    icon: 'productos',
+    hijos: [
+      {
+        href: '/productos-comerciales/',
+        label: 'Productos comerciales',
+        icon: 'productos',
+        desc: 'Hojuelas, harinas extruidas y mezclas de cereales andinos.',
+      },
+      {
+        href: '/programas-sociales/',
+        label: 'Programas sociales',
+        icon: 'sociales',
+        desc: 'Alimentos para Wasi Mikuna, Vaso de Leche y PAE.',
+      },
+    ],
+  },
+  { href: '/servicios/', label: 'Servicios', icon: 'servicios' },
+  { href: '/trabaja-con-nosotros/', label: 'Desarrollo profesional', icon: 'trabajo' },
+  { href: '/distribuidores/', label: 'Sé nuestro distribuidor', icon: 'distribuidor' },
+];
+
+const ruta = Astro.url.pathname;
+
+/** Marca el ítem de la página actual, y el padre si el activo es un hijo. */
+function activo(item: (typeof nav)[number]) {
+  if ('hijos' in item) return item.hijos.some((h) => ruta.startsWith(h.href));
+  return ruta.startsWith(item.href);
+}
+---
+
+<header class="sticky top-0 z-40 border-b border-border bg-crema-50/95 backdrop-blur">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-6 px-6 py-3">
+    <a href="/" class="shrink-0">
+      <picture>
+        <source srcset="/logo.webp" type="image/webp" />
+        <img src="/logo.png" alt="Peruanita" width="154" height="61" class="h-12 w-auto" />
+      </picture>
+    </a>
+
+    <nav id="nav-principal" aria-label="Principal" class="relative hidden lg:block">
+      {/*
+        El sombrero de la marca sigue al ítem apuntado y vuelve al de la
+        página actual al soltar. Va detrás del texto y sin capturar el
+        puntero, para no romper el hover de los enlaces.
+      */}
+      <span id="nav-sombrero" class="nav-sombrero" aria-hidden="true"></span>
+
+      <ul class="relative flex items-center gap-x-1 text-sm font-medium">
+        {nav.map((item) =>
+          'hijos' in item ? (
+            <li class="nav-item relative" data-submenu>
+              <button
+                type="button"
+                class="nav-enlace flex items-center gap-1.5"
+                aria-expanded="false"
+                aria-haspopup="true"
+                aria-current={activo(item) ? 'page' : undefined}
+              >
+                {item.label}
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  class="nav-chevron h-3.5 w-3.5"
+                  aria-hidden="true"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
+
+              <div class="nav-panel" role="menu" aria-label={item.label}>
+                <ul class="w-80 border border-border bg-card p-2 shadow-xl">
+                  {item.hijos.map((hijo) => (
+                    <li role="none">
+                      <a
+                        href={hijo.href}
+                        role="menuitem"
+                        aria-current={ruta.startsWith(hijo.href) ? 'page' : undefined}
+                        class="group flex gap-3 p-3 transition-colors hover:bg-crema-100 aria-[current=page]:bg-rojo-50"
+                      >
+                        <span class="mt-0.5 text-primary">
+                          <Icon name={hijo.icon === 'sociales' ? 'tazon' : 'grano'} />
+                        </span>
+                        <span>
+                          <span class="block font-semibold text-foreground group-hover:text-primary">
+                            {hijo.label}
+                          </span>
+                          <span class="mt-0.5 block text-xs leading-relaxed text-muted-foreground">
+                            {hijo.desc}
+                          </span>
+                        </span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ) : (
+            <li class="nav-item">
+              <a
+                href={item.href}
+                class="nav-enlace"
+                aria-current={activo(item) ? 'page' : undefined}
+              >
+                {item.label}
+              </a>
+            </li>
+          )
+        )}
+      </ul>
+    </nav>
+
+    <button
+      type="button"
+      id="menu-abrir"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      aria-controls="menu-movil"
+      class="inline-flex h-11 w-11 items-center justify-center text-tinta-900 transition-colors hover:bg-crema-200 lg:hidden"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6" aria-hidden="true">
+        <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16" />
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- Panel móvil -->
+<div
+  id="menu-overlay"
+  class="pointer-events-none fixed inset-0 z-50 bg-tinta-900/50 opacity-0 transition-opacity duration-300 lg:hidden"
+></div>
+
+{/*
+  Sin translate-x-full de Tailwind: esa utilidad escribe la propiedad
+  `translate`, no `transform`, así que la regla de apertura nunca la
+  anulaba y el panel se quedaba fuera de pantalla. El desplazamiento se
+  maneja entero en el CSS de abajo.
+*/}
+<aside
+  id="menu-movil"
+  aria-label="Menú de navegación"
+  aria-hidden="true"
+  class="fixed inset-y-0 right-0 z-50 flex w-[min(22rem,90vw)] flex-col bg-crema-50 shadow-2xl lg:hidden"
+>
+  <div class="relative flex items-center justify-between overflow-hidden border-b border-border bg-crema-100 px-5 py-4">
+    <img
+      src="/marca-agua.webp"
+      alt=""
+      aria-hidden="true"
+      class="pointer-events-none absolute -right-6 top-1/2 h-32 w-auto -translate-y-1/2 -scale-x-100"
+    />
+    <picture class="relative">
+      <source srcset="/logo.webp" type="image/webp" />
+      <img src="/logo.png" alt="Peruanita" width="154" height="61" class="h-11 w-auto" />
+    </picture>
+    <button
+      type="button"
+      id="menu-cerrar"
+      aria-label="Cerrar menú"
+      class="relative inline-flex h-11 w-11 items-center justify-center text-tinta-900 transition-colors hover:bg-crema-200"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-6 w-6" aria-hidden="true">
+        <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18" />
+      </svg>
+    </button>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto px-3 py-5">
+    <ul class="space-y-1">
+      {nav.map((item, i) => (
+        <li class="menu-item opacity-0" style={`--delay:${70 + i * 50}ms`}>
+          {'hijos' in item ? (
+            <div class="mt-2 border-t border-border pt-4">
+              <p class="px-3 pb-2 text-[0.7rem] uppercase tracking-[0.16em] text-muted-foreground/70">
+                {item.label}
+              </p>
+              <ul class="space-y-1">
+                {item.hijos.map((hijo) => (
+                  <li>
+                    <a
+                      href={hijo.href}
+                      aria-current={ruta.startsWith(hijo.href) ? 'page' : undefined}
+                      class="menu-enlace"
+                    >
+                      <span class="menu-icono" aria-hidden="true">
+                        <Icon name={hijo.icon === 'sociales' ? 'tazon' : 'grano'} />
+                      </span>
+                      <span class="flex-1">{hijo.label}</span>
+                      <Icon name="arrow-right" class="menu-flecha h-4 w-4" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <a href={item.href} aria-current={activo(item) ? 'page' : undefined} class="menu-enlace">
+              <span class="menu-icono" aria-hidden="true">
+                {item.icon === 'empresa' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5" />
+                  </svg>
+                )}
+                {item.icon === 'servicios' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.3 4.3a4 4 0 015.4 5.4l7 7-2.3 2.3-7-7a4 4 0 01-5.4-5.4l2.4 2.4 1.7-1.7-2.4-2.4zM6 14l-3 3 4 4 3-3" />
+                  </svg>
+                )}
+                {item.icon === 'trabajo' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5h6a1 1 0 011 1v2H8V6a1 1 0 011-1zM3 8h18v11a1 1 0 01-1 1H4a1 1 0 01-1-1V8zm0 5h18" />
+                  </svg>
+                )}
+                {item.icon === 'distribuidor' && (
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" class="h-5 w-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h11v10H3zM14 10h4l3 3v4h-7zM7 20a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4z" />
+                  </svg>
+                )}
+              </span>
+              <span class="flex-1">{item.label}</span>
+              <Icon name="arrow-right" class="menu-flecha h-4 w-4" />
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  <div class="border-t border-border px-5 py-4 text-sm">
+    <a href="tel:+51917395887" class="block font-medium text-primary hover:text-rojo-700">
+      (+51) 917 395 887
+    </a>
+    <a href="mailto:comercial@peruanita.com" class="mt-1 block text-tinta-700 hover:text-primary">
+      comercial@peruanita.com
+    </a>
+  </div>
+</aside>
+
+<style>
+  .nav-enlace {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 0.9rem;
+    color: var(--color-tinta-700);
+    transition: color 200ms ease;
+    cursor: pointer;
+  }
+  .nav-enlace:hover,
+  .nav-item[data-abierto] .nav-enlace {
+    color: var(--color-rojo-600);
+  }
+  .nav-enlace[aria-current='page'] {
+    color: var(--color-rojo-600);
+    font-weight: 600;
+  }
+
+  .nav-chevron {
+    transition: transform 220ms ease;
+  }
+  .nav-item[data-abierto] .nav-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* Sombrero: se dibuja detrás del texto y se desplaza al ítem apuntado. */
+  .nav-sombrero {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 0;
+    height: 3.4rem;
+    background-image: url('/menu-sombrero.webp');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: auto 100%;
+    opacity: 0;
+    transform: translate(var(--x, 0), -50%);
+    width: var(--w, 0);
+    transition:
+      transform 380ms cubic-bezier(0.22, 1, 0.36, 1),
+      width 380ms cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 220ms ease;
+    pointer-events: none;
+  }
+  .nav-sombrero[data-visible] {
+    opacity: 1;
+  }
+
+  /* Panel desplegable */
+  .nav-panel {
+    position: absolute;
+    top: calc(100% + 0.55rem);
+    left: 0;
+    z-index: 50;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-0.4rem);
+    transition:
+      opacity 200ms ease,
+      transform 200ms ease,
+      visibility 200ms;
+  }
+  .nav-item[data-abierto] .nav-panel {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+
+  /* Fila del menú móvil: ícono en placa, texto y flecha que asoma. */
+  .menu-enlace {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.8rem 0.75rem;
+    font-size: 0.925rem;
+    font-weight: 500;
+    color: var(--color-tinta-700);
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+  .menu-enlace:hover {
+    background-color: var(--color-crema-200);
+    color: var(--color-rojo-600);
+  }
+  .menu-enlace[aria-current='page'] {
+    background-color: var(--color-rojo-50);
+    color: var(--color-rojo-600);
+    font-weight: 600;
+  }
+  .menu-icono {
+    display: flex;
+    height: 2.25rem;
+    width: 2.25rem;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-crema-200);
+    color: var(--color-rojo-600);
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+  .menu-enlace:hover .menu-icono,
+  .menu-enlace[aria-current='page'] .menu-icono {
+    background-color: var(--color-rojo-600);
+    color: #fff;
+  }
+  .menu-flecha {
+    opacity: 0;
+    translate: -0.4rem 0;
+    transition: opacity 180ms ease, translate 180ms ease;
+  }
+  .menu-enlace:hover .menu-flecha,
+  .menu-enlace[aria-current='page'] .menu-flecha {
+    opacity: 1;
+    translate: 0 0;
+  }
+
+  /*
+    Se usa la propiedad `translate` y no `transform`: Tailwind v4 escribe
+    ahí sus utilidades de desplazamiento, y mezclar las dos hacía que la
+    regla de apertura no anulara nada.
+  */
+  #menu-movil {
+    translate: 100% 0;
+    transition: translate 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  #menu-movil[data-open] {
+    translate: 0 0;
+  }
+  #menu-overlay[data-open] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  #menu-movil[data-open] .menu-item {
+    animation: menu-item-in 300ms ease-out forwards;
+    animation-delay: var(--delay);
+  }
+  @keyframes menu-item-in {
+    from {
+      opacity: 0;
+      transform: translateX(1.25rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-sombrero,
+    .nav-panel,
+    .nav-chevron,
+    #menu-overlay {
+      transition: none;
+    }
+    #menu-movil {
+      transition: none;
+    }
+    #menu-movil[data-open] .menu-item {
+      animation: none;
+      opacity: 1;
+    }
+  }
+</style>
+
+<script>
+  function initNav() {
+    const nav = document.getElementById('nav-principal');
+    const sombrero = document.getElementById('nav-sombrero');
+
+    if (nav && sombrero) {
+      const items = Array.from(nav.querySelectorAll<HTMLElement>('.nav-item'));
+      const actual = nav.querySelector<HTMLElement>('.nav-enlace[aria-current="page"]');
+
+      function moverA(destino: HTMLElement | null, visible: boolean) {
+        if (!destino || !sombrero || !nav) return;
+        const r = destino.getBoundingClientRect();
+        const base = nav.getBoundingClientRect();
+        sombrero.style.setProperty('--x', `${r.left - base.left}px`);
+        sombrero.style.setProperty('--w', `${r.width}px`);
+        sombrero.toggleAttribute('data-visible', visible);
+      }
+
+      /** En reposo el sombrero descansa sobre la página actual. */
+      const reposo = () => moverA(actual, Boolean(actual));
+
+      items.forEach((item) => {
+        const enlace = item.querySelector<HTMLElement>('.nav-enlace');
+        item.addEventListener('mouseenter', () => moverA(enlace, true));
+        enlace?.addEventListener('focus', () => moverA(enlace, true));
+      });
+
+      nav.addEventListener('mouseleave', reposo);
+      nav.addEventListener('focusout', (e) => {
+        if (!nav.contains(e.relatedTarget as Node)) reposo();
+      });
+
+      // Sin transición en la primera colocación: si no, el sombrero
+      // entraría deslizándose desde el borde izquierdo al cargar.
+      const previa = sombrero.style.transition;
+      sombrero.style.transition = 'none';
+      reposo();
+      requestAnimationFrame(() => {
+        sombrero.style.transition = previa;
+      });
+      window.addEventListener('resize', reposo);
+
+      // Desplegables
+      const conSubmenu = Array.from(nav.querySelectorAll<HTMLElement>('[data-submenu]'));
+
+      function cerrarTodos(excepto?: HTMLElement) {
+        conSubmenu.forEach((s) => {
+          if (s === excepto) return;
+          s.removeAttribute('data-abierto');
+          s.querySelector('.nav-enlace')?.setAttribute('aria-expanded', 'false');
+        });
+      }
+
+      conSubmenu.forEach((sub) => {
+        const disparador = sub.querySelector<HTMLButtonElement>('.nav-enlace');
+
+        function abrir(abierto: boolean) {
+          sub.toggleAttribute('data-abierto', abierto);
+          disparador?.setAttribute('aria-expanded', String(abierto));
+          if (abierto) cerrarTodos(sub);
+        }
+
+        sub.addEventListener('mouseenter', () => abrir(true));
+        sub.addEventListener('mouseleave', () => abrir(false));
+
+        disparador?.addEventListener('click', (e) => {
+          e.preventDefault();
+          abrir(!sub.hasAttribute('data-abierto'));
+        });
+
+        sub.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && sub.hasAttribute('data-abierto')) {
+            abrir(false);
+            disparador?.focus();
+          }
+        });
+
+        sub.addEventListener('focusout', (e) => {
+          if (!sub.contains(e.relatedTarget as Node)) abrir(false);
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!nav.contains(e.target as Node)) cerrarTodos();
+      });
+    }
+
+    // Panel móvil
+    const panel = document.getElementById('menu-movil');
+    const overlay = document.getElementById('menu-overlay');
+    const abrirBtn = document.getElementById('menu-abrir');
+    const cerrarBtn = document.getElementById('menu-cerrar');
+    if (!panel || !overlay || !abrirBtn || !cerrarBtn) return;
+
+    const enlaces = Array.from(panel.querySelectorAll<HTMLAnchorElement>('a[href]'));
+
+    function abrirMenu() {
+      panel!.setAttribute('data-open', '');
+      overlay!.setAttribute('data-open', '');
+      panel!.setAttribute('aria-hidden', 'false');
+      abrirBtn!.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      cerrarBtn!.focus();
+    }
+
+    function cerrarMenu() {
+      panel!.removeAttribute('data-open');
+      overlay!.removeAttribute('data-open');
+      panel!.setAttribute('aria-hidden', 'true');
+      abrirBtn!.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+
+    abrirBtn.addEventListener('click', abrirMenu);
+    cerrarBtn.addEventListener('click', cerrarMenu);
+    overlay.addEventListener('click', cerrarMenu);
+    enlaces.forEach((a) => a.addEventListener('click', cerrarMenu));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && panel.hasAttribute('data-open')) cerrarMenu();
+    });
+
+    // Con el panel abierto el foco no debe escaparse detrás del overlay.
+    panel.addEventListener('keydown', (e) => {
+      if (e.key !== 'Tab' || !panel.hasAttribute('data-open')) return;
+      const focusables = [cerrarBtn, ...enlaces];
+      const primero = focusables[0];
+      const ultimo = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === primero) {
+        e.preventDefault();
+        ultimo.focus();
+      } else if (!e.shiftKey && document.activeElement === ultimo) {
+        e.preventDefault();
+        primero.focus();
+      }
+    });
+
+    document.addEventListener(
+      'astro:before-swap',
+      () => {
+        document.body.style.overflow = '';
+      },
+      { once: true }
+    );
+  }
+
+  document.addEventListener('astro:page-load', initNav);
+</script>

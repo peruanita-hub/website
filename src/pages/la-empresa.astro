@@ -1,0 +1,177 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PageHero from '../components/PageHero.astro';
+import Watermark from '../components/Watermark.astro';
+import CertMarquee from '../components/CertMarquee.astro';
+import { Highlighter } from '../components/ui/Highlighter';
+import Reveal from '../components/ui/Reveal.astro';
+import Button from '../components/ui/Button.astro';
+import Icon from '../components/ui/Icon.astro';
+
+const crumbs = [{ label: 'La empresa', href: '/la-empresa/' }];
+
+const valores = [
+  {
+    icon: '/legacy/integrity_.webp',
+    label: 'Integridad',
+    texto: 'Actuamos con transparencia en cada proceso y con cada socio comercial.',
+  },
+  {
+    icon: '/legacy/commitment_.webp',
+    label: 'Compromiso',
+    texto: 'Con el bienestar de las familias peruanas y la calidad de cada lote.',
+  },
+  {
+    icon: '/legacy/leadership_.webp',
+    label: 'Liderazgo',
+    texto: 'Referentes en cereales andinos fortificados en el sur del país.',
+  },
+  {
+    icon: '/legacy/teameork1_.webp',
+    label: 'Trabajo en equipo',
+    texto: 'Un solo equipo desde el acopio del grano hasta el empaque final.',
+  },
+];
+
+const cifras = [
+  { valor: '1834', etiqueta: 'municipios alcanzados por el Programa Vaso de Leche' },
+  { valor: '9', etiqueta: 'productos en la línea comercial' },
+  { valor: '5', etiqueta: 'certificaciones y acreditaciones vigentes' },
+];
+---
+
+<BaseLayout
+  title="La empresa"
+  breadcrumbs={crumbs}
+  description="Peruanita E.I.R.L., empresa agroindustrial de Arequipa dedicada a la fabricación de alimentos a base de cereales para el Programa Vaso de Leche y el público en general."
+>
+  <SiteHeader slot="header" />
+
+  <PageHero title="La empresa" />
+
+  {/* Quiénes somos */}
+  <section class="relative overflow-hidden bg-crema-50 py-20 md:py-28">
+    <Watermark side="left" motif="trigo" />
+
+    <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-6 md:grid-cols-2 md:gap-16">
+      <Reveal from="left">
+        <p class="text-xs uppercase tracking-[0.18em] text-primary">Agroindustria peruana</p>
+        <h2 class="mt-4 font-display text-3xl leading-tight text-foreground md:text-4xl">
+          <Highlighter client:load action="underline" color="#C4160F" strokeWidth={4}>
+            Del grano andino a la mesa
+          </Highlighter>
+        </h2>
+        <p class="mt-8 text-lg leading-relaxed text-muted-foreground">
+          Somos una empresa agroindustrial del sector alimentario, dedicada a la fabricación y
+          comercialización de alimentos a base de cereales de consumo humano, destinados al Programa
+          Vaso de Leche y al público en general.
+        </p>
+        <Button href="/productos-comerciales/" class="mt-8">
+          Ver nuestros productos
+          <Icon name="arrow-right" class="h-4 w-4" />
+        </Button>
+      </Reveal>
+
+      <Reveal from="right" delay={120}>
+        <img
+          src="/legacy/Grains-png.webp"
+          alt="Cereales andinos procesados por Peruanita"
+          loading="lazy"
+          class="w-full object-cover"
+        />
+      </Reveal>
+    </div>
+  </section>
+
+  {/* Cifras */}
+  <section class="border-y border-border bg-tinta-900 py-14">
+    <div class="mx-auto grid max-w-5xl gap-10 px-6 sm:grid-cols-3">
+      {cifras.map((c, i) => (
+        <Reveal delay={i * 100} class="text-center">
+          <p class="font-display text-4xl text-oro-500 md:text-5xl">{c.valor}</p>
+          <p class="mx-auto mt-3 max-w-64 text-sm leading-relaxed text-rojo-50/80">{c.etiqueta}</p>
+        </Reveal>
+      ))}
+    </div>
+  </section>
+
+  {/* Misión y visión */}
+  <section class="relative overflow-hidden bg-crema-100 py-20 md:py-28">
+    <Watermark side="right" />
+
+    <div class="relative mx-auto max-w-5xl px-6">
+      <div class="grid gap-8 md:grid-cols-2">
+        <Reveal from="left" class="border-l-4 border-primary bg-card p-8 md:p-10">
+          <img src="/legacy/mission.webp" alt="" width="90" height="90" loading="lazy" class="h-12 w-12" />
+          <h2 class="mt-5 font-display text-xl text-foreground">Misión</h2>
+          <p class="mt-3 leading-relaxed text-muted-foreground">
+            Elaborar y proveer cereales y alimentos nutritivos, inocuos y de calidad, orientados a
+            satisfacer las necesidades de alimentación de la población peruana, actuando con
+            excelencia, integridad y compromiso con el bienestar de las comunidades.
+          </p>
+        </Reveal>
+
+        <Reveal from="right" delay={120} class="border-l-4 border-oro-500 bg-card p-8 md:p-10">
+          <img src="/legacy/vision.webp" alt="" width="102" height="84" loading="lazy" class="h-12 w-auto" />
+          <h2 class="mt-5 font-display text-xl text-foreground">Visión</h2>
+          <p class="mt-3 leading-relaxed text-muted-foreground">
+            Contribuir a un Perú mejor nutrido, llevando alimentos de calidad que favorezcan el
+            bienestar, la salud y el desarrollo de las familias peruanas.
+          </p>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+
+  {/* Valores */}
+  <section class="relative overflow-hidden py-20 md:py-28">
+    <img
+      src="/legacy/Product_bg.webp"
+      alt=""
+      loading="lazy"
+      class="absolute inset-0 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 bg-rojo-700/82"></div>
+
+    <div class="relative mx-auto max-w-6xl px-6">
+      <div class="text-center">
+        <h2 class="font-display text-2xl text-white md:text-3xl">
+          <Highlighter client:load action="underline" color="#F7B30B" strokeWidth={4}>
+            Nuestros valores
+          </Highlighter>
+        </h2>
+      </div>
+
+      <div class="mt-14 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {valores.map((v, i) => (
+          <Reveal delay={i * 90} class="text-center">
+            {/*
+              Los íconos son línea roja sobre transparente, así que sobre
+              el rojo de la sección se perdían. Van sobre un disco claro
+              para que el trazo se lea.
+            */}
+            <span class="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-crema-50 shadow-lg">
+              <img src={v.icon} alt="" width="265" height="264" loading="lazy" class="h-16 w-16" />
+            </span>
+            <h3 class="mt-5 font-display text-base text-white">{v.label}</h3>
+            <p class="mt-2 text-sm leading-relaxed text-white/80">{v.texto}</p>
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Certificaciones */}
+  <section class="bg-crema-50 py-16 md:py-20">
+    <div class="mx-auto max-w-6xl px-6">
+      <p class="text-center text-xs uppercase tracking-[0.18em] text-muted-foreground/70">
+        Certificada y acreditada por
+      </p>
+    </div>
+    <CertMarquee class="mt-8" />
+  </section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

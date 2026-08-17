@@ -1,0 +1,124 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PageHero from '../components/PageHero.astro';
+import Watermark from '../components/Watermark.astro';
+import FormField from '../components/FormField.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Alert from '../components/ui/Alert.astro';
+import Icon from '../components/ui/Icon.astro';
+import Reveal from '../components/ui/Reveal.astro';
+import ContactRow from '../components/ui/ContactRow.astro';
+---
+
+<BaseLayout
+  title="Sé nuestro distribuidor"
+  breadcrumbs={[{ label: "Sé nuestro distribuidor", href: "/distribuidores/" }]}
+  description="Distribuya los productos de Peruanita E.I.R.L. a nivel nacional. Alimentos para Wasi Mikuna, Vaso de Leche y PAE, con condiciones comerciales competitivas."
+>
+  <SiteHeader slot="header" />
+
+  <PageHero title="Distribuye nuestros productos" />
+
+  <section class="relative overflow-hidden bg-crema-50 py-20 md:py-24">
+    <Watermark side="right" />
+    <div class="relative mx-auto grid max-w-5xl gap-12 px-6 md:grid-cols-2 md:gap-16">
+      <Reveal from="left">
+        <p class="text-lg leading-relaxed text-muted-foreground">
+          En PERUANITA E.I.R.L. impulsamos alianzas comerciales con distribuidores y socios
+          estratégicos interesados en llevar nuestros productos a distintos mercados del país.
+        </p>
+
+        <ul class="mt-8 space-y-4">
+          <li class="flex gap-3.5">
+            <Icon name="package" class="mt-0.5 text-primary" />
+            <span class="text-sm text-muted-foreground">
+              Ponemos a su disposición una línea de alimentos orientados a programas sociales, como
+              Wasi Mikuna, Vaso de Leche y PAE, elaborados bajo estándares de calidad, inocuidad y
+              cumplimiento normativo.
+            </span>
+          </li>
+          <li class="flex gap-3.5">
+            <Icon name="shield" class="mt-0.5 text-primary" />
+            <span class="text-sm text-muted-foreground">
+              Nuestra empresa cuenta con capacidad para atender requerimientos a nivel nacional,
+              ofreciendo condiciones comerciales competitivas y una atención orientada a relaciones
+              de largo plazo.
+            </span>
+          </li>
+        </ul>
+
+        <Alert variant="accent" title="Ventaja comercial" class="mt-8">
+          En compras mayores a 500 kilos, el pedido incluye el costo de transporte.
+        </Alert>
+
+        <div class="mt-10">
+          <p class="text-xs uppercase tracking-[0.16em] text-muted-foreground/70">
+            O contáctenos directamente
+          </p>
+          <div class="mt-4 space-y-3">
+            <ContactRow
+              icon="mail"
+              href="mailto:comercial@peruanita.com"
+              label="Correo"
+              value="comercial@peruanita.com"
+            />
+            <ContactRow
+              icon="phone"
+              href="tel:+51917395887"
+              label="Teléfono"
+              value="(+51) 917 395 887"
+            />
+          </div>
+        </div>
+      </Reveal>
+
+      <Reveal from="right" delay={120}>
+        <Card as="div" class="p-6 md:p-8">
+          <form method="POST" action="/api/contacto" enctype="multipart/form-data">
+            <input type="hidden" name="formulario" value="distribuidores" />
+            {/* Honeypot: los bots rellenan todo; las personas no lo ven. */}
+            <div class="sr-only" aria-hidden="true">
+              <label>No llenar<input name="website" tabindex="-1" autocomplete="off" /></label>
+            </div>
+
+            <h2 class="flex items-center gap-3 font-display text-lg text-foreground">
+              <Icon name="mail" class="text-primary" />
+              Solicite información o cotización
+            </h2>
+            <div class="mt-6 space-y-4">
+              <FormField label="Nombre y/o razón social" name="razon_social" required />
+              <FormField
+                label="Adjuntar vigencia de poder"
+                name="vigencia_poder"
+                type="file"
+                accept=".pdf"
+                required
+                hint="En formato PDF."
+              />
+              <FormField label="Número de RUC" name="ruc" required />
+              <FormField
+                label="Adjuntar RNP vigente"
+                name="rnp"
+                type="file"
+                accept=".pdf"
+                required
+                hint="Registro Nacional de Proveedores, en formato PDF."
+              />
+              <FormField label="Correo de contacto" name="email" type="email" required />
+              <FormField label="Productos solicitados" name="productos" textarea />
+            </div>
+            <Button type="submit" class="mt-6 w-full">
+              Enviar solicitud
+              <Icon name="arrow-right" class="h-4 w-4" />
+            </Button>
+          </form>
+        </Card>
+      </Reveal>
+    </div>
+  </section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

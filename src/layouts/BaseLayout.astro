@@ -1,0 +1,114 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title: string;
+  description: string;
+  ogImage?: string;
+  noindex?: boolean;
+  /** Migas para el schema BreadcrumbList. La home se agrega sola. */
+  breadcrumbs?: { label: string; href: string }[];
+}
+
+const { title, description, ogImage, noindex = false, breadcrumbs = [] } = Astro.props;
+
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// Sin imagen de marca por defecto todavía (pendiente Fase 3): la etiqueta
+// og:image solo se emite cuando la página pasa una real (ej. foto de producto).
+const ogImageURL = ogImage ? new URL(ogImage, Astro.site) : undefined;
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': `${Astro.site}#organization`,
+  name: 'Peruanita E.I.R.L.',
+  url: Astro.site?.toString(),
+  logo: new URL('/logo.png', Astro.site).toString(),
+  email: 'comercial@peruanita.com',
+  telephone: '+51917395887',
+};
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': `${Astro.site}#localbusiness`,
+  name: 'Peruanita E.I.R.L.',
+  image: new URL('/logo.png', Astro.site).toString(),
+  telephone: '+51917395887',
+  email: 'comercial@peruanita.com',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Calle Francia Mz A Lote 9 Aptasa',
+    addressLocality: 'Cerro Colorado, Arequipa',
+    addressCountry: 'PE',
+  },
+};
+
+const breadcrumbSchema =
+  breadcrumbs.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [{ label: 'Inicio', href: '/' }, ...breadcrumbs].map((item, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: item.label,
+          item: new URL(item.href, Astro.site).toString(),
+        })),
+      }
+    : null;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/webp" href="/favicon.webp" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="canonical" href={canonicalURL} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <title>{title} · Peruanita</title>
+    <meta name="description" content={description} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={`${title} · Peruanita`} />
+    <meta property="og:description" content={description} />
+    {ogImageURL && <meta property="og:image" content={ogImageURL} />}
+    <meta property="og:locale" content="es_PE" />
+    <meta property="og:site_name" content="Peruanita" />
+
+    <meta name="twitter:card" content={ogImageURL ? 'summary_large_image' : 'summary'} />
+    <meta name="twitter:title" content={`${title} · Peruanita`} />
+    <meta name="twitter:description" content={description} />
+    {ogImageURL && <meta name="twitter:image" content={ogImageURL} />}
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    {breadcrumbSchema && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+    )}
+
+    <ClientRouter />
+
+    <slot name="head" />
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#contenido"
+      class="sr-only rounded-md bg-primary px-4 py-2 font-semibold text-primary-foreground focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50"
+    >
+      Saltar al contenido
+    </a>
+
+    <slot name="header" />
+    <main id="contenido" class="flex-1">
+      <slot />
+    </main>
+    <slot name="footer" />
+  </body>
+</html>

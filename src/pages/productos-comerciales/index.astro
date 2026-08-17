@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import PageHero from '../../components/PageHero.astro';
+import Watermark from '../../components/Watermark.astro';
+import Card from '../../components/ui/Card.astro';
+import { getProductos, getFeaturedImage } from '../../lib/wp';
+
+const productos = await getProductos();
+---
+
+<BaseLayout
+  title="Productos comerciales"
+  breadcrumbs={[{ label: "Productos comerciales", href: "/productos-comerciales/" }]}
+  description="Hojuelas de avena, harinas de quinua, kiwicha, cañihua y cebada, y mezclas de cereales andinos fortificados con vitaminas y minerales."
+>
+  <SiteHeader slot="header" />
+
+  <PageHero
+    title="Productos comerciales"
+    bg={null}
+    breadcrumbs={[{ label: 'Productos comerciales', href: '/productos-comerciales/' }]}
+  />
+
+  <section class="relative overflow-hidden py-20 md:py-24">
+    <Watermark side="left" motif="trigo" />
+    <div class="relative mx-auto max-w-6xl px-6">
+      <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {productos.map((producto) => {
+          const image = getFeaturedImage(producto);
+          return (
+            <li class="h-full">
+              <Card
+                href={`/productos-comerciales/${producto.slug}/`}
+                hoverable
+                class="group flex h-full flex-col items-center p-6 text-center"
+              >
+                {image && (
+                  <img
+                    src={image.source_url}
+                    alt={image.alt_text}
+                    width={image.media_details?.width}
+                    height={image.media_details?.height}
+                    loading="lazy"
+                    transition:name={`producto-img-${producto.slug}`}
+                    class="h-56 w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                )}
+                <h2 class="mt-5 font-display text-base font-bold text-foreground group-hover:text-primary">
+                  {producto.title.rendered}
+                </h2>
+                <p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+                  {producto.meta.descripcion_corta}
+                </p>
+              </Card>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  </section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

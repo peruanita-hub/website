@@ -1,0 +1,127 @@
+---
+import Icon from './ui/Icon.astro';
+
+const year = new Date().getFullYear();
+
+const enlaces = [
+  { href: '/la-empresa/', label: 'La empresa' },
+  { href: '/productos-comerciales/', label: 'Productos comerciales' },
+  { href: '/programas-sociales/', label: 'Programas sociales' },
+  { href: '/servicios/', label: 'Servicios' },
+];
+
+const contacto = [
+  { href: '/trabaja-con-nosotros/', label: 'Trabaja con nosotros' },
+  { href: '/distribuidores/', label: 'Sé nuestro distribuidor' },
+];
+---
+
+<footer class="relative overflow-hidden bg-tinta-900 text-rojo-50">
+  {/* La mazorca de la marca, muy tenue, para que el pie no sea un bloque plano. */}
+  <img
+    src="/marca-agua.webp"
+    alt=""
+    aria-hidden="true"
+    loading="lazy"
+    width="750"
+    height="1500"
+    class="pointer-events-none absolute -right-16 top-1/2 hidden h-[190%] w-auto -translate-y-1/2 -scale-x-100 opacity-[0.06] md:block"
+  />
+
+  <div class="relative mx-auto grid max-w-6xl gap-12 px-6 py-16 md:grid-cols-[1.3fr_1fr_1fr] md:py-20">
+    <div>
+      <picture>
+        <source srcset="/logo.webp" type="image/webp" />
+        <img src="/logo.png" alt="Peruanita" width="154" height="61" class="h-20 w-auto" />
+      </picture>
+
+      <p class="mt-6 max-w-xs text-sm leading-relaxed text-rojo-50/80">
+        Empresa agroindustrial certificada. Fabricamos cereales y alimentos fortificados para
+        programas sociales y consumo masivo.
+      </p>
+
+      <address class="mt-6 flex gap-3 text-sm not-italic text-rojo-50/80">
+        <Icon name="leaf" class="mt-0.5 h-4 w-4 text-oro-500" />
+        <span>
+          Calle Francia Mz A Lote 9 Aptasa<br />
+          Cerro Colorado, Arequipa, Perú
+        </span>
+      </address>
+    </div>
+
+    <nav aria-label="Secciones">
+      <h2 class="font-display text-sm text-white">Navegación</h2>
+      <ul class="mt-5 space-y-2.5 text-sm">
+        {enlaces.map((e) => (
+          <li>
+            <a
+              href={e.href}
+              class="inline-block text-rojo-50/80 transition-colors hover:text-white"
+            >
+              {e.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div>
+      <h2 class="font-display text-sm text-white">Contacto</h2>
+      <ul class="mt-5 space-y-3 text-sm">
+        <li>
+          <a
+            href="tel:+51917395887"
+            class="flex items-center gap-2.5 text-rojo-50/80 transition-colors hover:text-white"
+          >
+            <Icon name="phone" class="h-4 w-4 text-oro-500" />
+            (+51) 917 395 887
+          </a>
+        </li>
+        <li>
+          <a
+            href="tel:+51054444409"
+            class="flex items-center gap-2.5 text-rojo-50/80 transition-colors hover:text-white"
+          >
+            <Icon name="phone" class="h-4 w-4 text-oro-500" />
+            (+51) 054-444409
+          </a>
+        </li>
+        <li>
+          <a
+            href="mailto:comercial@peruanita.com"
+            class="flex items-center gap-2.5 text-rojo-50/80 transition-colors hover:text-white"
+          >
+            <Icon name="mail" class="h-4 w-4 text-oro-500" />
+            comercial@peruanita.com
+          </a>
+        </li>
+      </ul>
+
+      <ul class="mt-6 space-y-2.5 border-t border-white/15 pt-5 text-sm">
+        {contacto.map((e) => (
+          <li>
+            <a
+              href={e.href}
+              class="group inline-flex items-center gap-2 text-rojo-50/80 transition-colors hover:text-white"
+            >
+              {e.label}
+              <Icon
+                name="arrow-right"
+                class="h-3.5 w-3.5 transition-transform group-hover:translate-x-1"
+              />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="relative border-t border-white/15">
+    <div
+      class="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-5 text-xs text-rojo-50/60 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p>© {year} Peruanita E.I.R.L. Todos los derechos reservados.</p>
+      <p>Arequipa, Perú</p>
+    </div>
+  </div>
+</footer>

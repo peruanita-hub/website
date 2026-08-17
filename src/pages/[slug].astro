@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { getPages, getFeaturedImage } from '../lib/wp';
+
+export async function getStaticPaths() {
+  // Estas páginas tienen layout propio en src/pages/<slug>.astro — se
+  // excluyen aquí para no duplicar la ruta.
+  const customLayoutSlugs = [
+    'la-empresa',
+    'servicios',
+    'programas-sociales',
+    'distribuidores',
+    'trabaja-con-nosotros',
+  ];
+  const pages = await getPages();
+  return pages
+    .filter((page) => !customLayoutSlugs.includes(page.slug))
+    .map((page) => ({
+      params: { slug: page.slug },
+      props: { page },
+    }));
+}
+
+const { page } = Astro.props;
+const image = getFeaturedImage(page);
+
+function toDescription(html: string): string {
+  const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  return text.length > 160 ? `${text.slice(0, 157)}...` : text;
+}
+---
+
+<BaseLayout title={page.title.rendered} description={toDescription(page.content.rendered)}>
+  <SiteHeader slot="header" />
+
+  <article class="mx-auto max-w-2xl px-6 py-16 prose">
+    {image && (
+      <img
+        src={image.source_url}
+        alt={image.alt_text || page.title.rendered}
+        width={image.media_details?.width}
+        height={image.media_details?.height}
+        class="mb-6 h-16 w-auto"
+      />
+    )}
+    <h1 class="font-display font-bold text-3xl text-tinta-900">{page.title.rendered}</h1>
+    <div class="mt-4" set:html={page.content.rendered} />
+  </article>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

@@ -1,0 +1,321 @@
+---
+/**
+ * Slider del hero — composición por capas, réplica del sitio anterior.
+ *
+ * Cada slide es un "escenario" de proporción fija: el fondo cubre todo,
+ * la tabla/piso ocupa una franja inferior, y el producto se apoya sobre
+ * ella. Las capas se posicionan en porcentajes del escenario, así toda
+ * la composición escala junta sin descuadrarse.
+ *
+ * Orden de entrada: el fondo ya está → sube la tabla desde abajo →
+ * aparece el producto. `anim` y `delay` definen eso por capa.
+ *
+ * Nativo: CSS + ~50 líneas de JS. El original usaba Slider Revolution.
+ */
+const slides = [
+  {
+    bg: '/legacy/Slider_1_bg_1.webp',
+    alt: 'Línea completa de productos Maxifort sobre campo de trigo',
+    layers: [
+      {
+        src: '/legacy/slider_1_bg.webp',
+        anim: 'up',
+        delay: 120,
+        // Piso de madera: franja inferior, ancho completo.
+        wrapper: 'absolute inset-x-0 bottom-0 h-[26%]',
+        img: 'h-full w-full object-cover object-top',
+      },
+      {
+        src: '/legacy/products.webp',
+        anim: 'pop',
+        delay: 520,
+        // Los productos se apoyan sobre el piso: base al 17% desde abajo.
+        wrapper: 'absolute bottom-[17%] left-1/2 w-[86%] -translate-x-1/2 md:w-[68%]',
+        img: 'w-full object-contain',
+      },
+    ],
+  },
+  {
+    bg: '/legacy/slider_2_bg.webp',
+    alt: 'Productos para programas sociales sobre tablones de madera',
+    heading: 'Alimentos para programas sociales',
+    layers: [
+      {
+        src: '/legacy/slider_2_woo.webp',
+        anim: 'up',
+        delay: 120,
+        wrapper: 'absolute inset-x-0 bottom-0 h-[38%]',
+        img: 'h-full w-full object-cover object-top',
+      },
+      {
+        src: '/legacy/product-2.webp',
+        anim: 'pop',
+        delay: 520,
+        wrapper: 'absolute bottom-[25%] left-1/2 w-[80%] -translate-x-1/2 md:w-[57%]',
+        img: 'w-full object-contain',
+      },
+    ],
+  },
+  {
+    bg: '/legacy/slider_3_bg_2.webp',
+    alt: 'Kiwicha y Quinua Instantánea cayendo en chocolate',
+    // Este slide usa las coordenadas exactas del diseño original, sobre
+    // el mismo lienzo de 1920x900 que usaba Slider Revolution. Es la
+    // única forma de que el paquete calce dentro de la salpicadura: los
+    // porcentajes "a ojo" siempre dejaban las capas desalineadas.
+    // Orden de entrada: el fondo ya está → cae el paquete desde arriba →
+    // salta la salpicadura alrededor.
+    stage: { w: 1920, h: 900 },
+    layers: [
+      {
+        src: '/legacy/Slider_3_splash_back.webp',
+        anim: 'up',
+        delay: 620,
+        pos: { x: 659, y: 212, w: 1234 },
+      },
+      {
+        src: '/legacy/Slider_3_product.webp',
+        anim: 'drop',
+        delay: 120,
+        pos: { x: 978, y: 92, w: 511 },
+      },
+      {
+        src: '/legacy/Slider_3_splash_front.webp',
+        anim: 'up',
+        delay: 720,
+        pos: { x: 862, y: 382, w: 834 },
+      },
+    ],
+  },
+];
+
+/** Convierte las coordenadas del lienzo original a porcentajes CSS. */
+function toPercent(pos: { x: number; y: number; w: number }, stage: { w: number; h: number }) {
+  return `left:${(pos.x / stage.w) * 100}%;top:${(pos.y / stage.h) * 100}%;width:${(pos.w / stage.w) * 100}%`;
+}
+---
+
+<section
+  class="hero-slider relative w-full overflow-hidden bg-crema-100"
+  aria-roledescription="carrusel"
+  aria-label="Destacados de Peruanita"
+>
+  {/*
+    En escritorio la proporción es la del lienzo original (1920x900),
+    que es lo que mantiene alineadas las capas del slide de chocolate.
+    El tope de 72vh deja asomar la sección siguiente en pantallas
+    anchas; recorta arriba y abajo por igual, así que la composición
+    sigue centrada.
+  */}
+  <div class="relative aspect-3/2 w-full sm:aspect-video md:aspect-1920/900 md:max-h-[72vh]">
+    {slides.map((slide, i) => (
+      <div
+        class="hero-slide absolute inset-0"
+        role="group"
+        aria-roledescription="diapositiva"
+        aria-label={`${i + 1} de ${slides.length}`}
+        aria-hidden={i === 0 ? 'false' : 'true'}
+      >
+        <img
+          src={slide.bg}
+          alt={i === 0 ? slide.alt : ''}
+          loading={i === 0 ? 'eager' : 'lazy'}
+          fetchpriority={i === 0 ? 'high' : undefined}
+          class="absolute inset-0 h-full w-full object-cover"
+        />
+
+        {slide.stage ? (
+          // Lienzo del diseño original: se escala al ancho y se centra
+          // verticalmente, igual que un object-cover, para que las capas
+          // conserven entre sí la posición exacta del diseño.
+          <div class="hero-stage absolute left-0 top-1/2 w-full -translate-y-1/2" style={`aspect-ratio:${slide.stage.w}/${slide.stage.h}`}>
+            {slide.layers.map((layer) => (
+              <img
+                src={layer.src}
+                alt=""
+                loading="lazy"
+                data-anim={layer.anim}
+                style={`${toPercent(layer.pos, slide.stage)};--delay:${layer.delay}ms`}
+                class="hero-layer absolute"
+              />
+            ))}
+          </div>
+        ) : (
+          slide.layers.map((layer) => (
+            <div class={layer.wrapper}>
+              <img
+                src={layer.src}
+                alt=""
+                loading="lazy"
+                data-anim={layer.anim}
+                style={`--delay:${layer.delay}ms`}
+                class={`hero-layer ${layer.img}`}
+              />
+            </div>
+          ))
+        )}
+
+        {slide.heading && (
+          <div class="absolute inset-x-0 bottom-[8%] px-6">
+            <h2
+              class="hero-layer text-center font-display text-lg font-bold leading-tight tracking-wide text-white drop-shadow-lg sm:text-2xl md:text-3xl"
+              data-anim="up"
+              style="--delay:820ms"
+            >
+              {slide.heading}
+            </h2>
+          </div>
+        )}
+      </div>
+    ))}
+
+    <button
+      type="button"
+      class="hero-prev absolute left-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center bg-tinta-900/45 text-white backdrop-blur transition-colors hover:bg-tinta-900/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:left-6"
+      aria-label="Diapositiva anterior"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-5 w-5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 6l-6 6 6 6" />
+      </svg>
+    </button>
+    <button
+      type="button"
+      class="hero-next absolute right-3 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center bg-tinta-900/45 text-white backdrop-blur transition-colors hover:bg-tinta-900/70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white md:right-6"
+      aria-label="Diapositiva siguiente"
+    >
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="h-5 w-5" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+      </svg>
+    </button>
+
+    <div class="absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 gap-2.5">
+      {slides.map((_, i) => (
+        <button
+          type="button"
+          class="hero-dot h-2.5 w-2.5 rounded-full bg-white/60 transition-all hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+          aria-label={`Ir a la diapositiva ${i + 1}`}
+        />
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-slide {
+    opacity: 0;
+    transition: opacity 700ms ease-in-out;
+    pointer-events: none;
+  }
+  .hero-slide[data-active] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Reposo: la capa espera fuera de sitio hasta que su slide se activa.
+     Sin esto, al volver a un slide ya visto las capas aparecerían de
+     golpe en vez de reproducir su entrada. */
+  .hero-layer[data-anim='up'] {
+    opacity: 0;
+    transform: translateY(2.5rem);
+  }
+  .hero-layer[data-anim='pop'] {
+    opacity: 0;
+    transform: translateY(1rem) scale(0.9);
+  }
+  /* El paquete cae desde fuera del cuadro. */
+  .hero-layer[data-anim='drop'] {
+    opacity: 0;
+    transform: translateY(-60%);
+  }
+
+  .hero-slide[data-active] .hero-layer {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 600ms ease-out var(--delay),
+      transform 800ms cubic-bezier(0.22, 1, 0.36, 1) var(--delay);
+  }
+  /* La caída acelera y asienta, en vez de frenar suave como las demás. */
+  .hero-slide[data-active] .hero-layer[data-anim='drop'] {
+    transition:
+      opacity 250ms ease-out var(--delay),
+      transform 700ms cubic-bezier(0.45, 0, 0.25, 1.05) var(--delay);
+  }
+
+  .hero-dot[data-active] {
+    width: 1.75rem;
+    background-color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-slide,
+    .hero-slide .hero-layer {
+      transition: none;
+    }
+    .hero-layer {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  function initHeroSlider() {
+    const root = document.querySelector('.hero-slider');
+    if (!root) return;
+
+    const slides = Array.from(root.querySelectorAll<HTMLElement>('.hero-slide'));
+    const dots = Array.from(root.querySelectorAll<HTMLElement>('.hero-dot'));
+    const prev = root.querySelector<HTMLButtonElement>('.hero-prev');
+    const next = root.querySelector<HTMLButtonElement>('.hero-next');
+    if (slides.length === 0) return;
+
+    let current = 0;
+    let timer: number | undefined;
+
+    function show(index: number) {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => {
+        const active = i === current;
+        slide.toggleAttribute('data-active', active);
+        slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+      });
+      dots.forEach((dot, i) => dot.toggleAttribute('data-active', i === current));
+    }
+
+    function start() {
+      // Sin autoplay si el usuario pidió menos movimiento: queda en el
+      // slide 1 y los controles siguen navegando a mano.
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      stop();
+      // Tiempo de lectura + lo que tardan en entrar las capas.
+      timer = window.setInterval(() => show(current + 1), 6500);
+    }
+
+    function stop() {
+      if (timer) window.clearInterval(timer);
+      timer = undefined;
+    }
+
+    function goTo(index: number) {
+      show(index);
+      start();
+    }
+
+    dots.forEach((dot, i) => dot.addEventListener('click', () => goTo(i)));
+    prev?.addEventListener('click', () => goTo(current - 1));
+    next?.addEventListener('click', () => goTo(current + 1));
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', start);
+
+    show(0);
+    start();
+
+    document.addEventListener('astro:before-swap', stop, { once: true });
+  }
+
+  document.addEventListener('astro:page-load', initHeroSlider);
+</script>

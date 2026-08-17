@@ -1,0 +1,67 @@
+---
+import { cn } from '../../lib/utils';
+
+/** Íconos de trazo, en un único juego para que no se mezclen estilos. */
+export type IconName =
+  | 'leaf'
+  | 'grano'
+  | 'tazon'
+  | 'package'
+  | 'list'
+  | 'shield'
+  | 'sparkles'
+  | 'arrow-left'
+  | 'arrow-right'
+  | 'mail'
+  | 'phone';
+
+interface Props {
+  name: IconName;
+  class?: string;
+}
+
+const { name, class: className }: Props = Astro.props;
+
+/** Un ícono es uno o varios trazos; los compuestos van como arreglo. */
+const paths: Record<IconName, string | string[]> = {
+  leaf: 'M11 20A7 7 0 019.8 6.1C13.4 4.6 17 5 21 3c0 9-4 13.5-8.5 15.4M4 21c0-5 2-9 5-11',
+  // Espiga: tallo con tres pares de granos.
+  grano: [
+    'M12 21v-9',
+    'M12 12c-2.6 0-4.2-1.9-4.2-4.2 2.6 0 4.2 1.9 4.2 4.2z',
+    'M12 12c2.6 0 4.2-1.9 4.2-4.2-2.6 0-4.2 1.9-4.2 4.2z',
+    'M12 7.6c-2.6 0-4.2-1.9-4.2-4.2 2.6 0 4.2 1.9 4.2 4.2z',
+    'M12 7.6c2.6 0 4.2-1.9 4.2-4.2-2.6 0-4.2 1.9-4.2 4.2z',
+    'M12 16.4c-2.6 0-4.2-1.9-4.2-4.2 2.6 0 4.2 1.9 4.2 4.2z',
+    'M12 16.4c2.6 0 4.2-1.9 4.2-4.2-2.6 0-4.2 1.9-4.2 4.2z',
+  ],
+  // Tazón humeante: alimentación escolar.
+  tazon: ['M3 12h18v.6a9 9 0 01-18 0V12z', 'M8.5 8.5c0-1.2 1-1.6 1-2.8', 'M12 8.5c0-1.2 1-1.6 1-2.8', 'M15.5 8.5c0-1.2 1-1.6 1-2.8'],
+  package: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4',
+  list: 'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+  shield: 'M12 3l7 3v6c0 4.4-3 7.8-7 9-4-1.2-7-4.6-7-9V6l7-3zM9.5 12l2 2 3.5-4',
+  sparkles:
+    'M12 3l1.9 4.6L18.5 9.5l-4.6 1.9L12 16l-1.9-4.6L5.5 9.5l4.6-1.9L12 3zM19 15l.9 2.1L22 18l-2.1.9L19 21l-.9-2.1L16 18l2.1-.9L19 15z',
+  'arrow-left': 'M19 12H5m0 0l6 6m-6-6l6-6',
+  'arrow-right': 'M5 12h14m0 0l-6-6m6 6l-6 6',
+  mail: 'M3 7l9 6 9-6M3 7v10a1 1 0 001 1h16a1 1 0 001-1V7a1 1 0 00-1-1H4a1 1 0 00-1 1z',
+  phone:
+    'M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z',
+};
+
+const d = paths[name];
+const trazos = Array.isArray(d) ? d : [d];
+---
+
+<svg
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.75"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  class={cn('h-5 w-5 shrink-0', className)}
+>
+  {trazos.map((trazo) => <path d={trazo} />)}
+</svg>

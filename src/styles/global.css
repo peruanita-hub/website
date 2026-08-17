@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+/*
+  Archivo Black para títulos, Ubuntu Sans para el contenido.
+  Solo subconjunto latino: los paquetes completos traen además cirílico
+  y griego, que este sitio no usa.
+
+  Archivo Black viene en un solo peso (400): ya es negra por diseño, no
+  existe una versión más liviana ni más pesada.
+*/
+@import "@fontsource/archivo-black/latin-400.css";
+@import "@fontsource/ubuntu-sans/latin-400.css";
+@import "@fontsource/ubuntu-sans/latin-500.css";
+@import "@fontsource/ubuntu-sans/latin-700.css";
+
+/*
+  Sistema de diseño — derivado del logo real en uso (mazorca-niña con
+  sombrero rojo, wordmark script), no inventado. Hex extraídos por
+  muestreo de píxeles del PNG del header en producción.
+
+  rojo-600 (no rojo-500) es el color de texto/enlace/CTA: el rojo puro
+  de marca (#F7221D) da 4.04:1 sobre blanco, por debajo del mínimo AA
+  de 4.5:1 para texto normal — se reserva para títulos grandes,
+  fondos e ilustración. rojo-600 da 6.05:1, seguro para cualquier texto.
+  El dorado (#F7B30B) da 1.84:1: solo decorativo, nunca como texto.
+*/
+@theme {
+  --font-display: "Archivo Black", system-ui, sans-serif;
+  --font-body: "Ubuntu Sans", system-ui, sans-serif;
+
+  --color-rojo-50: #FDEDEC;
+  --color-rojo-100: #FAD6D3;
+  --color-rojo-500: #F7221D; /* rojo de marca — decorativo/grande, no texto */
+  --color-rojo-600: #C4160F; /* texto, links, CTA — AA seguro */
+  --color-rojo-700: #9E1109;
+
+  --color-oro-100: #FDF1D2;
+  --color-oro-300: #F5CE5C;
+  --color-oro-500: #F7B30B; /* decorativo únicamente */
+  --color-oro-600: #D89A05;
+
+  --color-crema-50: #FFFEFC;
+  --color-crema-100: #FEFAF3;
+  --color-crema-200: #F7EEDF;
+
+  --color-tinta-700: #4A3A32;
+  --color-tinta-900: #2B1810;
+
+  --color-borde: #E8DDD3;
+
+  /*
+    Capa semántica, con los nombres de shadcn/ui mapeados a la marca.
+    Los componentes de src/components/ui usan estos tokens y nunca un
+    color de marca directo: cambiar la marca aquí repinta todo el sistema.
+  */
+  --color-background: var(--color-crema-100);
+  --color-foreground: var(--color-tinta-900);
+  --color-card: var(--color-crema-50);
+  --color-card-foreground: var(--color-tinta-900);
+  --color-primary: var(--color-rojo-600);
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: var(--color-crema-200);
+  --color-secondary-foreground: var(--color-tinta-900);
+  --color-muted: var(--color-crema-200);
+  --color-muted-foreground: var(--color-tinta-700);
+  --color-accent: var(--color-oro-100);
+  --color-accent-foreground: var(--color-tinta-900);
+  --color-destructive: #B3261E;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: var(--color-borde);
+  --color-input: var(--color-borde);
+  --color-ring: var(--color-rojo-600);
+
+  /*
+    Esquinas rectas en todo el sistema: botones, campos y tarjetas.
+    Se incluye --radius porque la clase `rounded` a secas no usa
+    --radius-md sino su propio valor, y se quedaría redondeada.
+  */
+  --radius: 0;
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-foreground);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+  Un solo anillo de foco para todo el sitio, visible sobre fondo claro y
+  sobre fondo rojo/oscuro. :focus-visible y no :focus para que no
+  aparezca al hacer clic con el mouse.
+*/
+:focus-visible {
+  outline: 2px solid var(--color-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+.on-dark :focus-visible,
+[data-on-dark] :focus-visible {
+  outline-color: #FFFFFF;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+}
+
+/*
+  Estilo del HTML que llega crudo desde wp/v2 (page.content.rendered,
+  producto.content.rendered). Reemplaza al plugin @tailwindcss/typography:
+  solo 5 etiquetas en juego, más simple mantenerlo a mano.
+*/
+.prose h2 {
+  margin-top: 2rem;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--color-tinta-900);
+}
+.prose p {
+  margin-top: 0.75rem;
+  color: var(--color-tinta-700);
+  line-height: 1.7;
+}
+.prose ul {
+  margin-top: 0.75rem;
+  padding-left: 1.25rem;
+  list-style: disc;
+  color: var(--color-tinta-700);
+}
+.prose li {
+  margin-top: 0.25rem;
+}
+.prose strong {
+  font-weight: 650;
+  color: var(--color-tinta-900);
+}
+.prose a {
+  color: var(--color-rojo-600);
+  text-underline-offset: 0.15em;
+}
+.prose a:hover {
+  color: var(--color-rojo-700);
+}

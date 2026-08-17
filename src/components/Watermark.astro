@@ -1,0 +1,42 @@
+---
+import { cn } from '../lib/utils';
+
+/**
+ * Motivo de marca pegado al borde de una sección, para romper los
+ * fondos planos.
+ *
+ * Dos motivos: la media mazorca del logo y la espiga de trigo. Ambos
+ * archivos son la mitad izquierda del dibujo, así que para el borde
+ * derecho se voltean en horizontal y el mismo archivo sirve de los dos
+ * lados, quedando simétrico respecto al centro de la página.
+ *
+ * No llevan opacity: los PNG ya vienen translúcidos de origen. Bajarles
+ * la opacidad encima los dejaba invisibles sobre el fondo crema.
+ */
+interface Props {
+  side?: 'left' | 'right';
+  motif?: 'mazorca' | 'trigo';
+  class?: string;
+}
+
+const { side = 'left', motif = 'mazorca', class: className }: Props = Astro.props;
+
+const src = motif === 'trigo' ? '/trigo.webp' : '/marca-agua.webp';
+---
+
+<img
+  src={src}
+  alt=""
+  aria-hidden="true"
+  loading="lazy"
+  width="750"
+  height="1500"
+  class={cn(
+    'pointer-events-none absolute inset-y-0 hidden h-full w-auto select-none md:block',
+    side === 'left' ? 'left-0' : 'right-0 -scale-x-100',
+    // El trigo es un trazo suelto, más fuerte que la mazorca: se atenúa
+    // para que no compita con el texto.
+    motif === 'trigo' && 'opacity-25',
+    className
+  )}
+/>

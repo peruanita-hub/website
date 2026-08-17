@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import HeroSlider from '../components/HeroSlider.astro';
+import CertMarquee from '../components/CertMarquee.astro';
+import Button from '../components/ui/Button.astro';
+import { Highlighter } from '../components/ui/Highlighter';
+
+const accesos = [
+  {
+    href: '/productos-comerciales/',
+    bg: '/legacy/Comerciales-bg.webp',
+    titulo: 'Productos',
+    subtitulo: 'comerciales',
+    texto: 'Hojuelas, harinas extruidas y mezclas de cereales andinos fortificados.',
+  },
+  {
+    href: '/programas-sociales/',
+    bg: '/legacy/sociales.webp',
+    titulo: 'Productos para',
+    subtitulo: 'programas sociales',
+    texto: 'Alimentos para Wasi Mikuna, Vaso de Leche y PAE, con normativa vigente.',
+  },
+];
+---
+
+<BaseLayout
+  title="Alimentos fortificados a base de cereales andinos"
+  description="Peruanita E.I.R.L. fabrica hojuelas de avena, harinas de quinua, kiwicha y cañihua, y alimentos fortificados para programas sociales en Arequipa, Perú."
+>
+  <SiteHeader slot="header" />
+
+  {/*
+    El slider es puramente visual, así que la página se quedaba sin h1:
+    era el hallazgo #8 de la auditoría SEO. Va oculto a la vista pero
+    disponible para lectores de pantalla y buscadores, que necesitan un
+    encabezado principal por página.
+  */}
+  <h1 class="sr-only">
+    Peruanita E.I.R.L. — Alimentos fortificados a base de cereales andinos en Arequipa
+  </h1>
+
+  <HeroSlider />
+
+  {/*
+    Empresa Certificada.
+    Texto y banda de acreditadoras van juntos en la columna izquierda;
+    el tazón entra por el borde derecho a media imagen y queda montado
+    sobre la banda.
+  */}
+  <section class="relative overflow-hidden bg-crema-50 pt-24 pb-16 md:pt-28 md:pb-20">
+    <div class="mx-auto max-w-7xl px-6">
+      <div class="md:max-w-[56%] lg:max-w-[52%]">
+        <h2 class="font-display text-3xl font-bold text-foreground md:text-4xl lg:text-5xl">
+          <Highlighter client:load action="underline" color="#C4160F" strokeWidth={5}>
+            Empresa certificada
+          </Highlighter>
+        </h2>
+        <p class="mt-8 text-lg leading-relaxed text-muted-foreground">
+          Somos una empresa industrial perteneciente al sector alimentario que cuenta con las
+          certificaciones que permiten prevenir y controlar factores de riesgos que avalan la
+          inocuidad de los insumos utilizados, garantizando así la calidad de nuestros productos.
+        </p>
+        <Button href="/la-empresa/" variant="outline" class="mt-9">Conocer la empresa</Button>
+      </div>
+
+      <p class="mt-20 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground/70">
+        Certificada y acreditada por
+      </p>
+    </div>
+
+    {/*
+      La banda va a ancho completo y sin recorte por la derecha: los
+      logos entran desde detrás del tazón, así que un degradado ahí
+      delataría el corte en vez de disimularlo.
+    */}
+    <CertMarquee fade="left" class="relative z-0 mt-8" />
+
+    {/*
+      El tazón asoma por el borde derecho a media imagen y queda montado
+      sobre la banda. Decorativo (alt vacío) y oculto en móvil, donde no
+      hay ancho para que entre sin comerse el texto.
+    */}
+    <img
+      src="/legacy/Bg_1.webp"
+      alt=""
+      loading="lazy"
+      width="672"
+      height="939"
+      class="pointer-events-none absolute right-0 top-1/2 z-20 hidden w-120 -translate-y-1/2 translate-x-[38%] md:block lg:w-160 xl:w-184"
+    />
+  </section>
+
+  <!-- Dos accesos, mismo alto -->
+  <section class="grid md:grid-cols-2">
+    {accesos.map((acceso) => (
+      <a
+        href={acceso.href}
+        class="group relative flex min-h-100 items-center justify-center overflow-hidden p-12 text-center md:min-h-125"
+      >
+        <img
+          src={acceso.bg}
+          alt=""
+          loading="lazy"
+          class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+        <div class="absolute inset-0 bg-tinta-900/50 transition-colors duration-300 group-hover:bg-tinta-900/60"></div>
+        {/*
+          max-w-md, no max-w-sm: "programas sociales" en Archivo Black no
+          entra en 24rem y se partía en una tercera línea.
+        */}
+        <div class="relative max-w-md">
+          <h2 class="font-display text-3xl font-bold leading-tight text-white md:text-4xl">
+            <Highlighter client:load action="underline" color="#F7B30B" strokeWidth={3}>
+              {acceso.titulo}<br />{acceso.subtitulo}
+            </Highlighter>
+          </h2>
+          <p class="mt-6 text-sm leading-relaxed text-white/90">{acceso.texto}</p>
+          {/*
+            La tarjeta entera ya es el enlace, así que esto es solo el
+            aspecto del botón: un <a> anidado sería HTML inválido.
+          */}
+          <span
+            class="mt-8 inline-flex h-12 items-center justify-center border-2 border-white px-8 text-sm font-bold text-white transition-colors group-hover:bg-white group-hover:text-primary"
+          >
+            Ver productos
+          </span>
+        </div>
+      </a>
+    ))}
+  </section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

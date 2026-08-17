@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PageHero from '../components/PageHero.astro';
+import Watermark from '../components/Watermark.astro';
+import Card from '../components/ui/Card.astro';
+import Icon from '../components/ui/Icon.astro';
+import { getServicios, getFeaturedImage } from '../lib/wp';
+
+const servicios = await getServicios();
+const crumbs = [{ label: 'Servicios', href: '/servicios/' }];
+
+/*
+  El lado de la foto alterna contando solo los servicios que tienen
+  imagen: si se contara la posición en la lista completa, el servicio sin
+  foto que queda en medio rompería la alternancia y las dos fotos
+  caerían del mismo lado.
+*/
+const ladoPorSlug = new Map<string, boolean>();
+servicios
+  .filter((s) => getFeaturedImage(s))
+  .forEach((s, i) => ladoPorSlug.set(s.slug, i % 2 === 1));
+---
+
+<BaseLayout
+  title="Servicios"
+  breadcrumbs={crumbs}
+  description="Maquila, lavado y secado de quinua, y tostado de granos. Peruanita E.I.R.L., su socio estratégico para la producción de alimentos en Arequipa."
+>
+  <SiteHeader slot="header" />
+
+  <PageHero title="Servicios" />
+
+  <section class="relative overflow-hidden bg-crema-50 py-20 md:py-24">
+    <Watermark side="right" />
+    <div class="relative mx-auto max-w-5xl px-6">
+      <p class="mx-auto max-w-2xl text-center text-lg text-muted-foreground">
+        En Peruanita E.I.R.L. somos su socio estratégico para la producción de alimentos.
+      </p>
+
+      {/*
+        Los servicios alternan el lado de la foto para que la lista no
+        caiga en un patrón rígido. El que no tiene foto ocupa el ancho
+        completo, en vez de dejar media tarjeta vacía.
+      */}
+      <div class="mt-16 space-y-10">
+        {servicios.map((servicio) => {
+          const image = getFeaturedImage(servicio);
+          const invertido = ladoPorSlug.get(servicio.slug) ?? false;
+
+          if (!image) {
+            return (
+              <Card as="article" class="p-8 md:p-10">
+                <h2 class="flex items-center gap-3 font-display text-xl text-foreground">
+                  <Icon name="shield" class="text-primary" />
+                  {servicio.title.rendered}
+                </h2>
+                <div class="prose mt-3 max-w-3xl" set:html={servicio.content.rendered} />
+              </Card>
+            );
+          }
+
+          return (
+            <Card as="article" class="overflow-hidden">
+              <div class="grid sm:grid-cols-2 sm:items-stretch">
+                <img
+                  src={image.source_url}
+                  alt={image.alt_text || servicio.title.rendered}
+                  width={image.media_details?.width}
+                  height={image.media_details?.height}
+                  loading="lazy"
+                  class:list={[
+                    'h-64 w-full object-cover sm:h-full sm:min-h-72',
+                    invertido && 'sm:order-2',
+                  ]}
+                />
+                <div class="flex flex-col justify-center p-8 md:p-10">
+                  <h2 class="flex items-center gap-3 font-display text-xl text-foreground">
+                    <Icon name="shield" class="text-primary" />
+                    {servicio.title.rendered}
+                  </h2>
+                  <div class="prose mt-3" set:html={servicio.content.rendered} />
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

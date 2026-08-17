@@ -1,0 +1,20 @@
+---
+/**
+ * Divisor de firma: hilera de "granos" rojo/dorado, en la proporción
+ * del logo (hoja roja, grano dorado cada tercio). No es decoración
+ * genérica — es el motivo literal del producto que vende Peruanita.
+ */
+interface Props {
+  count?: number;
+  class?: string;
+}
+
+const { count = 20, class: className = '' } = Astro.props;
+const items = Array.from({ length: count });
+---
+
+<div class={`flex gap-1.5 ${className}`} role="presentation" aria-hidden="true">
+  {items.map((_, i) => (
+    <span class={`h-3 w-1.5 shrink-0 rounded-full ${i % 3 === 0 ? 'bg-oro-500' : 'bg-rojo-500'}`} />
+  ))}
+</div>

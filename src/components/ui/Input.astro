@@ -1,0 +1,31 @@
+---
+import { cn } from '../../lib/utils';
+
+interface Props {
+  type?: astroHTML.JSX.InputHTMLAttributes['type'];
+  id: string;
+  name: string;
+  class?: string;
+  [key: string]: unknown;
+}
+
+const { type = 'text', class: className, ...rest } = Astro.props;
+---
+
+<input
+  type={type}
+  class={cn(
+    'flex h-11 w-full rounded-md border border-input bg-card px-3 py-2 text-sm text-foreground',
+    'placeholder:text-muted-foreground/60 transition-colors',
+    'hover:border-muted-foreground/40',
+    'disabled:cursor-not-allowed disabled:opacity-50',
+    // El archivo adjunto usa el mismo alto que el resto de campos.
+    'file:mr-3 file:rounded file:border-0 file:bg-secondary file:px-3 file:py-1.5',
+    'file:text-sm file:font-medium file:text-secondary-foreground',
+    // Marca los campos inválidos solo después de que la persona intentó
+    // enviar, no mientras escribe.
+    'user-invalid:border-destructive user-invalid:ring-1 user-invalid:ring-destructive',
+    className
+  )}
+  {...rest}
+/>

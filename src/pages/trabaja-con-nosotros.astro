@@ -1,0 +1,129 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PageHero from '../components/PageHero.astro';
+import Watermark from '../components/Watermark.astro';
+import FormField from '../components/FormField.astro';
+import Button from '../components/ui/Button.astro';
+import Card from '../components/ui/Card.astro';
+import Alert from '../components/ui/Alert.astro';
+import Icon from '../components/ui/Icon.astro';
+import Reveal from '../components/ui/Reveal.astro';
+import ContactRow from '../components/ui/ContactRow.astro';
+---
+
+<BaseLayout
+  title="Desarrollo profesional"
+  breadcrumbs={[{ label: "Desarrollo profesional", href: "/trabaja-con-nosotros/" }]}
+  description="Pasantías y prácticas preprofesionales y profesionales en Peruanita E.I.R.L., Arequipa. Envíe su CV documentado y certificado de notas."
+>
+  <SiteHeader slot="header" />
+
+  <PageHero title="Oportunidades profesionales" />
+
+  <section class="relative overflow-hidden bg-crema-50 py-20 md:py-24">
+    <Watermark side="left" />
+    <div class="relative mx-auto grid max-w-5xl gap-12 px-6 md:grid-cols-2 md:gap-16">
+      <Reveal from="left">
+        <p class="text-lg leading-relaxed text-muted-foreground">
+          En PERUANITA E.I.R.L. valoramos el talento y el compromiso de quienes buscan construir una
+          trayectoria profesional con responsabilidad, dedicación y visión de crecimiento.
+        </p>
+
+        <ul class="mt-8 space-y-4">
+          <li class="flex gap-3.5">
+            <Icon name="sparkles" class="mt-0.5 text-primary" />
+            <span class="text-sm text-muted-foreground">
+              Como parte de nuestro compromiso con la formación y el impulso de nuevos
+              profesionales, brindamos oportunidades para acceder a pasantías, así como a espacios
+              destinados al desarrollo de prácticas preprofesionales y profesionales, en un entorno
+              que promueve el aprendizaje, la experiencia y la mejora continua.
+            </span>
+          </li>
+          <li class="flex gap-3.5">
+            <Icon name="list" class="mt-0.5 text-primary" />
+            <span class="text-sm text-muted-foreground">
+              Estas oportunidades están dirigidas a estudiantes y egresados que deseen fortalecer
+              sus competencias y adquirir experiencia dentro de una organización orientada a la
+              calidad y al desarrollo responsable de sus actividades.
+            </span>
+          </li>
+          <li class="flex gap-3.5">
+            <Icon name="shield" class="mt-0.5 text-primary" />
+            <span class="text-sm text-muted-foreground">
+              La participación en estos procesos se encuentra sujeta a la evaluación de la hoja de
+              vida documentada y a la revisión del perfil académico del postulante.
+            </span>
+          </li>
+        </ul>
+
+        <Alert variant="accent" title="Requisito" class="mt-8">
+          Adjuntar CV documentado y certificado de notas.
+        </Alert>
+
+        <div class="mt-10">
+          <p class="text-xs uppercase tracking-[0.16em] text-muted-foreground/70">
+            O escríbanos directamente
+          </p>
+          <div class="mt-4 space-y-3">
+            <ContactRow
+              icon="mail"
+              href="mailto:contacto@peruanita.com"
+              label="Envío de postulaciones"
+              value="contacto@peruanita.com"
+            />
+            <ContactRow
+              icon="phone"
+              href="https://wa.me/51984249796"
+              label="Seguimiento por WhatsApp"
+              value="984 249 796"
+            />
+          </div>
+        </div>
+      </Reveal>
+
+      <Reveal from="right" delay={120}>
+        <Card as="div" class="p-6 md:p-8">
+        <form method="POST" action="/api/contacto" enctype="multipart/form-data">
+          <input type="hidden" name="formulario" value="postulacion" />
+          {/* Honeypot: los bots rellenan todo; las personas no lo ven. */}
+          <div class="sr-only" aria-hidden="true">
+            <label>No llenar<input name="website" tabindex="-1" autocomplete="off" /></label>
+          </div>
+
+          <h2 class="flex items-center gap-3 font-display text-lg text-foreground">
+            <Icon name="list" class="text-primary" />
+            Envíe su postulación
+          </h2>
+          <div class="mt-6 space-y-4">
+            <FormField label="Nombres completos" name="nombre" required />
+            <FormField label="Edad" name="edad" type="number" required />
+            <FormField label="Email" name="email" type="email" required />
+            <FormField label="Profesión" name="profesion" required />
+            <FormField
+              label="Disponibilidad"
+              name="disponibilidad"
+              required
+              hint="Por ejemplo: tiempo completo, medio tiempo, a partir de marzo."
+            />
+            <FormField
+              label="Adjuntar CV"
+              name="cv"
+              type="file"
+              accept=".pdf,.doc,.docx"
+              hint="Formato PDF o Word. Adjunte también su certificado de notas."
+            />
+          </div>
+          <Button type="submit" class="mt-6 w-full">
+            Enviar postulación
+            <Icon name="arrow-right" class="h-4 w-4" />
+          </Button>
+        </form>
+        </Card>
+      </Reveal>
+    </div>
+  </section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

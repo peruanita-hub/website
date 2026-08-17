@@ -1,0 +1,108 @@
+---
+import { cn } from '../lib/utils';
+
+/**
+ * Banda infinita de entidades certificadoras y acreditadoras.
+ *
+ * El scroll continuo sin corte sale de renderizar la lista dos veces y
+ * animar -50%: cuando la primera copia termina de salir, la segunda
+ * está exactamente donde arrancó la primera, así que el reinicio es
+ * invisible. Solo CSS — sin JS ni librería de carrusel.
+ *
+ * No trae fondo ni borde propios: quien lo usa decide el marco, porque
+ * a veces va a ancho completo y a veces dentro de una columna.
+ */
+interface Props {
+  class?: string;
+  label?: string;
+  /**
+   * Dónde difuminar los extremos. 'left' sirve cuando por la derecha
+   * los logos salen de detrás de otro elemento: ahí un degradado
+   * delataría el corte en vez de disimularlo.
+   */
+  fade?: 'both' | 'left' | 'none';
+}
+
+const {
+  class: className,
+  label = 'Certificaciones y acreditaciones',
+  fade = 'both',
+}: Props = Astro.props;
+
+const entidades = [
+  { src: '/logos/iso-9001.webp', alt: 'Certificación ISO 9001' },
+  { src: '/logos/iso-14001.webp', alt: 'Certificación ISO 14001:2015' },
+  { src: '/logos/haccp.webp', alt: 'Certificación HACCP Food Safety' },
+  { src: '/logos/digesa.webp', alt: 'DIGESA — Ministerio de Salud del Perú' },
+  { src: '/logos/senasa.webp', alt: 'SENASA — Servicio Nacional de Sanidad Agraria del Perú' },
+];
+---
+
+<div
+  class={cn('marquee relative overflow-hidden', className)}
+  data-fade={fade}
+  role="group"
+  aria-label={label}
+>
+  <div class="marquee-track flex w-max items-center gap-16 md:gap-20">
+    {[0, 1].map((copia) => (
+      <div
+        class="flex shrink-0 items-center gap-16 md:gap-20"
+        aria-hidden={copia === 1 ? 'true' : undefined}
+      >
+        {entidades.map((e) => (
+          <img
+            src={e.src}
+            alt={copia === 0 ? e.alt : ''}
+            width="300"
+            height="120"
+            loading="lazy"
+            class="h-14 w-auto shrink-0 object-contain md:h-16 lg:h-20"
+          />
+        ))}
+      </div>
+    ))}
+  </div>
+</div>
+
+<style>
+  .marquee[data-fade='both'] {
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 4rem,
+      #000 calc(100% - 4rem),
+      transparent
+    );
+  }
+  .marquee[data-fade='left'] {
+    mask-image: linear-gradient(to right, transparent, #000 4rem);
+  }
+
+  .marquee-track {
+    animation: marquee 40s linear infinite;
+  }
+  .marquee:hover .marquee-track {
+    animation-play-state: paused;
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      /* -50% = el ancho exacto de una copia, por eso no se nota el salto. */
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track {
+      animation: none;
+    }
+    .marquee {
+      overflow-x: auto;
+      mask-image: none;
+    }
+  }
+</style>

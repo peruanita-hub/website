@@ -1,0 +1,24 @@
+---
+import { cn } from '../../lib/utils';
+
+interface Props {
+  variant?: 'default' | 'accent' | 'destructive';
+  title?: string;
+  class?: string;
+}
+
+const { variant = 'default', title, class: className }: Props = Astro.props;
+
+const variants = {
+  default: 'border-border bg-card text-card-foreground',
+  accent: 'border-l-4 border-l-oro-500 border-border bg-accent text-accent-foreground',
+  destructive: 'border-destructive/40 bg-destructive/5 text-foreground',
+};
+---
+
+<div class={cn('rounded-md border px-4 py-3 text-sm', variants[variant], className)} role="note">
+  {title && <p class="font-display font-bold">{title}</p>}
+  <div class={title ? 'mt-1' : undefined}>
+    <slot />
+  </div>
+</div>

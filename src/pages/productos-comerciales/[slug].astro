@@ -1,0 +1,201 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Breadcrumb from '../../components/ui/Breadcrumb.astro';
+import Button from '../../components/ui/Button.astro';
+import { Highlighter } from '../../components/ui/Highlighter';
+import Icon from '../../components/ui/Icon.astro';
+import Reveal from '../../components/ui/Reveal.astro';
+import Watermark from '../../components/Watermark.astro';
+import { getProductos, getFeaturedImage, parseJsonMeta } from '../../lib/wp';
+
+export async function getStaticPaths() {
+  const productos = await getProductos();
+  return productos.map((producto, i) => ({
+    params: { slug: producto.slug },
+    props: {
+      producto,
+      // Para navegar entre fichas sin volver al índice.
+      anterior: productos[(i - 1 + productos.length) % productos.length],
+      siguiente: productos[(i + 1) % productos.length],
+    },
+  }));
+}
+
+const { producto, anterior, siguiente } = Astro.props;
+
+const crumbs = [
+  { label: 'Productos comerciales', href: '/productos-comerciales/' },
+  { label: producto.title.rendered, href: `/productos-comerciales/${producto.slug}/` },
+];
+
+const ingredientes = parseJsonMeta<string[]>(producto.meta.ingredientes, []);
+const beneficios = parseJsonMeta<string[]>(producto.meta.beneficios, []);
+const presentaciones = parseJsonMeta<{ gramaje: string }[]>(producto.meta.presentaciones, []);
+const image = getFeaturedImage(producto);
+
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: producto.title.rendered,
+  description: producto.meta.descripcion_corta || producto.title.rendered,
+  sku: producto.slug,
+  ...(image && { image: image.source_url }),
+  brand: { '@type': 'Brand', name: 'Peruanita' },
+};
+---
+
+<BaseLayout
+  title={producto.title.rendered}
+  description={producto.meta.descripcion_corta || producto.title.rendered}
+  ogImage={image?.source_url}
+  breadcrumbs={crumbs}
+>
+  <script slot="head" is:inline type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+
+  <SiteHeader slot="header" />
+
+  <div class="border-b border-border bg-crema-50">
+    <div class="mx-auto max-w-6xl px-6 py-6">
+      <Breadcrumb items={crumbs} />
+    </div>
+  </div>
+
+  <article class="relative overflow-hidden">
+    {/* La mazorca acompaña la columna de texto, del lado derecho. */}
+    <Watermark side="right" />
+
+    <div class="relative mx-auto max-w-6xl px-6 py-14 md:py-20">
+      <div class="grid gap-12 md:grid-cols-[1.05fr_1fr] md:items-start md:gap-16">
+        {/* El packshot ya es transparente: va suelto, sin marco. */}
+        <Reveal from="left" class="md:sticky md:top-28">
+          {image && (
+            <img
+              src={image.source_url}
+              alt={image.alt_text}
+              width={image.media_details?.width}
+              height={image.media_details?.height}
+              fetchpriority="high"
+              transition:name={`producto-img-${producto.slug}`}
+              class="mx-auto h-auto w-full max-w-md object-contain drop-shadow-xl"
+            />
+          )}
+        </Reveal>
+
+        <div>
+        <h1 class="font-display text-3xl leading-tight text-foreground md:text-4xl">
+          <Highlighter client:load action="underline" color="#C4160F" strokeWidth={4}>
+            {producto.title.rendered}
+          </Highlighter>
+        </h1>
+
+        {producto.meta.descripcion_corta && (
+          <p class="mt-8 text-lg leading-relaxed text-muted-foreground">
+            {producto.meta.descripcion_corta}
+          </p>
+        )}
+
+        <div class="prose mt-4" set:html={producto.content.rendered} />
+
+        {presentaciones.length > 0 && (
+          <Reveal as="section" class="mt-10">
+            <h2 class="flex items-center gap-2.5 font-display text-lg text-foreground">
+              <Icon name="package" class="text-primary" />
+              Presentaciones
+            </h2>
+            <ul class="mt-4 flex flex-wrap gap-2">
+              {presentaciones.map((p) => (
+                <li>
+                  <Badge variant="accent">{p.gramaje}</Badge>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        )}
+
+        {beneficios.length > 0 && (
+          <Reveal as="section" class="mt-10">
+            <h2 class="flex items-center gap-2.5 font-display text-lg text-foreground">
+              <Icon name="sparkles" class="text-primary" />
+              Beneficios
+            </h2>
+            <ul class="mt-4 space-y-3">
+              {beneficios.map((b) => (
+                <li class="flex gap-3 text-muted-foreground">
+                  <Icon name="shield" class="mt-0.5 h-4.5 w-4.5 text-oro-600" />
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        )}
+
+        {ingredientes.length > 0 && (
+          <Reveal as="section" class="mt-10">
+            <h2 class="flex items-center gap-2.5 font-display text-lg text-foreground">
+              <Icon name="leaf" class="text-primary" />
+              Ingredientes
+            </h2>
+            <ul class="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+              {ingredientes.map((i) => (
+                <li class="flex gap-2.5 text-sm text-muted-foreground">
+                  <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-oro-500" aria-hidden="true"
+                  ></span>
+                  <span>{i}</span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+        )}
+
+        <div class="mt-12 border-t border-border pt-8">
+          <p class="text-sm text-muted-foreground">
+            ¿Le interesa distribuir este producto?
+          </p>
+          <Button href="/distribuidores/" class="mt-4">
+            Solicitar cotización
+            <Icon name="arrow-right" class="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+
+      {/* Navegación entre fichas */}
+      <nav
+        class="mt-16 grid gap-4 border-t border-border pt-8 sm:grid-cols-2"
+        aria-label="Otros productos"
+      >
+      <a
+        href={`/productos-comerciales/${anterior.slug}/`}
+        class="group flex items-center gap-3 text-sm text-muted-foreground transition-colors hover:text-primary"
+      >
+        <Icon name="arrow-left" class="transition-transform group-hover:-translate-x-1" />
+        <span class="min-w-0">
+          <span class="block text-xs uppercase tracking-wider text-muted-foreground/60">
+            Anterior
+          </span>
+          <span class="block truncate font-medium">{anterior.title.rendered}</span>
+        </span>
+      </a>
+      <a
+        href={`/productos-comerciales/${siguiente.slug}/`}
+        class="group flex items-center justify-end gap-3 text-right text-sm text-muted-foreground transition-colors hover:text-primary"
+      >
+        <span class="min-w-0">
+          <span class="block text-xs uppercase tracking-wider text-muted-foreground/60">
+            Siguiente
+          </span>
+          <span class="block truncate font-medium">{siguiente.title.rendered}</span>
+        </span>
+          <Icon name="arrow-right" class="transition-transform group-hover:translate-x-1" />
+        </a>
+      </nav>
+    </div>
+  </article>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>
+
+

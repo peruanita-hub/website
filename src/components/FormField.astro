@@ -1,0 +1,35 @@
+---
+import Label from './ui/Label.astro';
+import Input from './ui/Input.astro';
+import Textarea from './ui/Textarea.astro';
+
+interface Props {
+  label: string;
+  name: string;
+  type?: astroHTML.JSX.InputHTMLAttributes['type'];
+  required?: boolean;
+  textarea?: boolean;
+  accept?: string;
+  hint?: string;
+}
+
+const { label, name, type = 'text', required = false, textarea = false, accept, hint } =
+  Astro.props;
+
+const id = `campo-${name}`;
+const hintId = hint ? `${id}-hint` : undefined;
+---
+
+<div class="space-y-1.5">
+  <Label for={id} required={required}>{label}</Label>
+  {textarea ? (
+    <Textarea id={id} name={name} required={required} aria-describedby={hintId} />
+  ) : (
+    <Input id={id} name={name} type={type} accept={accept} required={required} aria-describedby={hintId} />
+  )}
+  {hint && (
+    <p id={hintId} class="text-xs text-muted-foreground">
+      {hint}
+    </p>
+  )}
+</div>

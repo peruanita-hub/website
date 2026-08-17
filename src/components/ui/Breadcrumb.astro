@@ -1,0 +1,63 @@
+---
+import { cn } from '../../lib/utils';
+
+interface Props {
+  items: { label: string; href: string }[];
+  /** Sobre fondo oscuro o fotografía, para que mantenga contraste. */
+  onDark?: boolean;
+  class?: string;
+}
+
+const { items, onDark = false, class: className }: Props = Astro.props;
+const trail = [{ label: 'Inicio', href: '/' }, ...items];
+---
+
+<nav aria-label="Migas de pan" class={cn('text-[0.95rem]', className)}>
+  <ol
+    class:list={[
+      'flex flex-wrap items-center gap-x-1 gap-y-1.5',
+      onDark ? 'text-white/70' : 'text-muted-foreground',
+    ]}
+  >
+    {trail.map((item, i) => {
+      const esUltimo = i === trail.length - 1;
+      return (
+        <li class="flex items-center gap-x-1">
+          {i > 0 && (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              class:list={[
+                'mx-1 h-3.5 w-3.5 shrink-0',
+                onDark ? 'text-white/40' : 'text-muted-foreground/40',
+              ]}
+              aria-hidden="true"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+            </svg>
+          )}
+          {esUltimo ? (
+            <span
+              aria-current="page"
+              class:list={['font-semibold', onDark ? 'text-white' : 'text-foreground']}
+            >
+              {item.label}
+            </span>
+          ) : (
+            <a
+              href={item.href}
+              class:list={[
+                'underline-offset-4 transition-colors hover:underline',
+                onDark ? 'hover:text-white' : 'hover:text-primary',
+              ]}
+            >
+              {item.label}
+            </a>
+          )}
+        </li>
+      );
+    })}
+  </ol>
+</nav>

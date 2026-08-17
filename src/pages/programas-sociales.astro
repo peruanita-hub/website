@@ -1,0 +1,200 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import PageHero from '../components/PageHero.astro';
+import Watermark from '../components/Watermark.astro';
+import { Highlighter } from '../components/ui/Highlighter';
+import Reveal from '../components/ui/Reveal.astro';
+import Card from '../components/ui/Card.astro';
+import Button from '../components/ui/Button.astro';
+import Icon from '../components/ui/Icon.astro';
+
+const crumbs = [{ label: 'Programas sociales', href: '/programas-sociales/' }];
+
+const lineas = [
+  {
+    icon: 'package' as const,
+    titulo: 'Hojuelas de cereales',
+    texto:
+      'Crudas y pre-cocidas, formuladas a base de cereales, con o sin quinopodiáceas, leguminosas, tubérculos, vitaminas y minerales.',
+  },
+  {
+    icon: 'sparkles' as const,
+    titulo: 'Reconstitución instantánea',
+    texto:
+      'Enriquecidos lácteos y mezclas fortificadas, desarrollados a base de cereales con o sin quinopodiáceas, leguminosas y tubérculos.',
+  },
+  {
+    icon: 'leaf' as const,
+    titulo: 'Extruidos expandidos',
+    texto:
+      'Desarrollados a base de cereales, con o sin quinopodiáceas, leguminosas, tubérculos, vitaminas y minerales.',
+  },
+];
+
+const campana = [
+  { src: '/legacy/campana-2.webp', alt: 'Avena instantánea Peruanita, ideal para niños' },
+  { src: '/legacy/campana-3.webp', alt: 'Familia disfrutando Kiwicha y Quinua Instantánea Maxifort' },
+  { src: '/legacy/campana-4.webp', alt: 'Productos Peruanita para programas de alimentación' },
+];
+---
+
+<BaseLayout
+  title="Productos para programas sociales"
+  breadcrumbs={crumbs}
+  description="Alimentos para Wasi Mikuna, Vaso de Leche y PAE: hojuelas de cereales, enriquecidos lácteos y extruidos, bajo estándares de calidad e inocuidad."
+>
+  <SiteHeader slot="header" />
+
+  <PageHero title="Productos para programas sociales" />
+
+  {/* Wasi Mikuna */}
+  <section class="relative overflow-hidden bg-crema-50 py-20 md:py-28">
+    <Watermark side="left" motif="trigo" />
+
+    <div class="relative mx-auto grid max-w-6xl items-center gap-12 px-6 md:grid-cols-2 md:gap-16">
+      <Reveal from="left">
+        <img
+          src="/legacy/wai-mikuna.webp"
+          alt="Programa Nacional de Alimentación Escolar Comunitaria Wasi Mikuna"
+          width="298"
+          height="139"
+          loading="eager"
+          class="h-16 w-auto object-contain"
+        />
+        <h2 class="mt-6 font-display text-3xl leading-tight text-foreground md:text-4xl">
+          <Highlighter client:load action="underline" color="#C4160F" strokeWidth={4}>
+            Alimentamos escuelas de todo el país
+          </Highlighter>
+        </h2>
+        <p class="mt-8 text-lg leading-relaxed text-muted-foreground">
+          Peruanita E.I.R.L. brinda para el programa Wasi Mikuna alimentos ricos, variados y
+          nutritivos a niños y niñas de inicial y primaria de las escuelas públicas de todo el país.
+        </p>
+        <Button href="/distribuidores/" class="mt-8">
+          Solicitar cotización
+          <Icon name="arrow-right" class="h-4 w-4" />
+        </Button>
+      </Reveal>
+
+      <Reveal from="right" delay={120}>
+        <img
+          src="/legacy/campana-1.webp"
+          alt="Programa de Alimentación Escolar PAE"
+          loading="lazy"
+          class="w-full object-cover shadow-lg"
+        />
+      </Reveal>
+    </div>
+  </section>
+
+  {/* Líneas de producto */}
+  <section class="border-y border-border bg-crema-100 py-20 md:py-28">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="max-w-2xl">
+        <p class="text-xs uppercase tracking-[0.18em] text-primary">Qué fabricamos</p>
+        <h2 class="mt-4 font-display text-2xl text-foreground md:text-3xl">
+          <Highlighter client:load action="underline" color="#C4160F" strokeWidth={4}>
+            Líneas para programas sociales
+          </Highlighter>
+        </h2>
+        <p class="mt-8 leading-relaxed text-muted-foreground">
+          Elaboramos alimentos diseñados para atender los requerimientos de los programas sociales,
+          cumpliendo estrictamente con los estándares de calidad e inocuidad.
+        </p>
+      </div>
+
+      <div class="mt-14 grid gap-6 md:grid-cols-3">
+        {lineas.map((l, i) => (
+          <Reveal delay={i * 90}>
+            <Card class="h-full p-8">
+              <span class="flex h-12 w-12 items-center justify-center bg-accent text-primary">
+                <Icon name={l.icon} class="h-6 w-6" />
+              </span>
+              <h3 class="mt-6 font-display text-lg text-foreground">{l.titulo}</h3>
+              <p class="mt-3 text-sm leading-relaxed text-muted-foreground">{l.texto}</p>
+            </Card>
+          </Reveal>
+        ))}
+      </div>
+
+      <Reveal class="mt-10 flex gap-4 border-l-4 border-oro-500 bg-card p-6">
+        <Icon name="shield" class="mt-0.5 shrink-0 text-oro-600" />
+        <p class="text-sm leading-relaxed text-muted-foreground">
+          <strong class="text-foreground">Garantía de calidad.</strong> Todos nuestros productos
+          cumplen con la normativa sanitaria vigente, asegurando procesos confiables y productos
+          aptos para su comercialización y consumo.
+        </p>
+      </Reveal>
+    </div>
+  </section>
+
+  {/* Vaso de Leche */}
+  <section class="relative overflow-hidden py-20 md:py-28">
+    <img
+      src="/legacy/Product_bg.webp"
+      alt=""
+      loading="lazy"
+      class="absolute inset-0 h-full w-full object-cover"
+    />
+    <div class="absolute inset-0 bg-rojo-700/82"></div>
+
+    <div class="relative mx-auto max-w-5xl px-6">
+      <Reveal class="text-center">
+        <h2 class="font-display text-2xl text-white md:text-3xl">
+          <Highlighter client:load action="underline" color="#F7B30B" strokeWidth={4}>
+            Programa Vaso de Leche
+          </Highlighter>
+        </h2>
+      </Reveal>
+
+      <div class="mt-14 grid gap-8 md:grid-cols-3">
+        <Reveal delay={0}>
+          <p class="font-display text-3xl text-oro-500">Ley 24059</p>
+          <p class="mt-3 text-sm leading-relaxed text-white/80">
+            Programa social creado por ley y complementado con la Ley 27470, para ofrecer una ración
+            diaria de alimentos a población vulnerable.
+          </p>
+        </Reveal>
+        <Reveal delay={100}>
+          <p class="font-display text-3xl text-oro-500">0 a 13 años</p>
+          <p class="mt-3 text-sm leading-relaxed text-white/80">
+            Prioriza niños de 0 a 6 años y gestantes, seguidos de niños de 7 a 13 años, tercera edad
+            y personas con TBC.
+          </p>
+        </Reveal>
+        <Reveal delay={200}>
+          <p class="font-display text-3xl text-oro-500">1834 municipios</p>
+          <p class="mt-3 text-sm leading-relaxed text-white/80">
+            Uno de los pocos programas sociales con cobertura nacional, entre municipalidades
+            provinciales y distritales.
+          </p>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+
+  {/* Campaña */}
+  <section class="border-t border-border bg-crema-100 py-20 md:py-24">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="text-center">
+        <h2 class="font-display text-2xl text-foreground md:text-3xl">
+          <Highlighter client:load action="underline" color="#C4160F" strokeWidth={4}>
+            Nuestros productos
+          </Highlighter>
+        </h2>
+      </div>
+
+      <div class="mt-12 grid gap-6 sm:grid-cols-3">
+        {campana.map((c, i) => (
+          <Reveal delay={i * 90}>
+            <img src={c.src} alt={c.alt} loading="lazy" class="h-72 w-full object-cover md:h-80" />
+          </Reveal>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>

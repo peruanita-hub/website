@@ -1,0 +1,56 @@
+---
+import Breadcrumb from './ui/Breadcrumb.astro';
+import { Highlighter } from './ui/Highlighter';
+
+/**
+ * Cabecera de página interna: migas y título centrado, con el subrayado
+ * a mano alzada de la marca.
+ */
+interface Props {
+  title: string;
+  /** Foto de fondo. `null` deja la cabecera lisa. */
+  bg?: string | null;
+  light?: boolean;
+  breadcrumbs?: { label: string; href: string }[];
+}
+
+const { title, bg = '/legacy/Product_bg.webp', light = true, breadcrumbs = [] }: Props =
+  Astro.props;
+---
+
+<section
+  class:list={[
+    'relative overflow-hidden py-16 md:py-24',
+    !bg && 'border-b border-border bg-crema-50',
+  ]}
+>
+  {bg && (
+    <>
+      <img src={bg} alt="" loading="eager" class="absolute inset-0 h-full w-full object-cover" />
+      {/*
+        Velo más liviano que antes (85% -> 60%): con el anterior la foto
+        de granos casi no se distinguía y la cabecera parecía lisa.
+      */}
+      <div class={`absolute inset-0 ${light ? 'bg-crema-50/60' : 'bg-tinta-900/60'}`}></div>
+    </>
+  )}
+
+  <div class="relative mx-auto max-w-6xl px-6">
+    {breadcrumbs.length > 0 && <Breadcrumb items={breadcrumbs} class="mb-8" />}
+
+    <div class="text-center">
+      <h1
+        class={`font-display text-3xl leading-tight sm:text-4xl md:text-5xl lg:text-6xl ${
+          light ? 'text-tinta-900' : 'text-white'
+        }`}
+      >
+        <Highlighter client:load action="underline"
+          color={light ? '#C4160F' : '#F7B30B'}
+          strokeWidth={5}
+        >
+          {title}
+        </Highlighter>
+      </h1>
+    </div>
+  </div>
+</section>

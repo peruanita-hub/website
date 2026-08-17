@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+import { cn } from '../../lib/utils';
+
+/**
+ * Dato de contacto como fila propia con su ícono, en vez de un enlace
+ * embebido en un párrafo: dentro del texto corrido los enlaces quedaban
+ * pegados a la palabra anterior y sin espacio para respirar.
+ */
+interface Props {
+  icon: 'mail' | 'phone' | 'list' | 'package';
+  href: string;
+  label: string;
+  value: string;
+  class?: string;
+}
+
+const { icon, href, label, value, class: className }: Props = Astro.props;
+---
+
+<a
+  href={href}
+  class={cn(
+    'group flex items-center gap-4 border border-border bg-card px-4 py-3.5 transition-colors hover:border-primary/40 hover:bg-crema-100',
+    className
+  )}
+>
+  <span
+    class="flex h-10 w-10 shrink-0 items-center justify-center bg-accent text-primary transition-colors group-hover:bg-primary group-hover:text-white"
+  >
+    <Icon name={icon} />
+  </span>
+  <span class="min-w-0">
+    <span class="block text-xs uppercase tracking-wider text-muted-foreground/70">{label}</span>
+    <span class="block truncate font-medium text-foreground group-hover:text-primary">
+      {value}
+    </span>
+  </span>
+</a>
