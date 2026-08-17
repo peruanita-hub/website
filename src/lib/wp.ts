@@ -62,12 +62,28 @@ export interface Page {
   };
 }
 
-async function wpFetch<T>(path: string): Promise<T> {
-  const res = await fetch(`${WP_URL}${path}`);
-  if (!res.ok) {
-    throw new Error(`WP REST ${path} -> ${res.status}`);
+/**
+ * El hosting de origen tiene un pool de PHP-FPM chico; en builds que
+ * disparan varias páginas a la vez alguna request puede toparse con el
+ * pool saturado y volver con una página de error en vez de JSON. Se
+ * reintenta antes de fallar el build entero por eso.
+ */
+async function wpFetch<T>(path: string, intentos = 3): Promise<T> {
+  for (let intento = 1; intento <= intentos; intento++) {
+    try {
+      const res = await fetch(`${WP_URL}${path}`);
+      if (!res.ok) {
+        throw new Error(`WP REST ${path} -> ${res.status}`);
+      }
+      return (await res.json()) as T;
+    } catch (err) {
+      if (intento === intentos) {
+        throw new Error(`WP REST ${path} falló tras ${intentos} intentos: ${err}`);
+      }
+      await new Promise((r) => setTimeout(r, 500 * intento));
+    }
   }
-  return res.json() as Promise<T>;
+  throw new Error('inalcanzable');
 }
 
 export function getProductos() {
