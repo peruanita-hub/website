@@ -79,6 +79,17 @@ export interface Page {
  */
 const cache = new Map<string, Promise<unknown>>();
 
+/**
+ * Un corte real llegó a durar los 36s completos de los 12 reintentos
+ * (ver commit "Ampliar la ventana de reintentos"). Como último recurso
+ * —agotados los reintentos— se usa esta copia del contenido, tomada en
+ * un momento sano, para que un corte del origen no tumbe el deploy
+ * entero. Se regenera a mano de vez en cuando; ver README de esta
+ * carpeta o pedirle a Claude "actualizá el snapshot de WP".
+ */
+import snapshot from '../data/wp-snapshot.json';
+const snapshotTyped = snapshot as Record<string, unknown>;
+
 async function wpFetchSinCache<T>(path: string, intentos = 12): Promise<T> {
   for (let intento = 1; intento <= intentos; intento++) {
     try {
@@ -89,6 +100,12 @@ async function wpFetchSinCache<T>(path: string, intentos = 12): Promise<T> {
       return (await res.json()) as T;
     } catch (err) {
       if (intento === intentos) {
+        if (path in snapshotTyped) {
+          console.warn(
+            `WP REST ${path} falló tras ${intentos} intentos, usando snapshot de respaldo: ${err}`
+          );
+          return snapshotTyped[path] as T;
+        }
         throw new Error(`WP REST ${path} falló tras ${intentos} intentos: ${err}`);
       }
       // Los cortes vistos en producción duraron ~13s seguidos: con
