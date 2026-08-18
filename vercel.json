@@ -1,0 +1,29 @@
+{
+  "redirects": [
+    {
+      "source": "/producto-para-programas-sociales/:path*",
+      "destination": "/programas-sociales/",
+      "permanent": true
+    },
+    {
+      "source": "/trabajo/:path*",
+      "destination": "/trabaja-con-nosotros/",
+      "permanent": true
+    },
+    {
+      "source": "/productos-comerciales/harina-de-maca-2/",
+      "destination": "/productos-comerciales/harina-de-maca/",
+      "permanent": true
+    },
+    {
+      "source": "/productos-comerciales/harina-de-quinua-2/",
+      "destination": "/productos-comerciales/harina-de-quinua/",
+      "permanent": true
+    },
+    {
+      "source": "/maintenance/",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
+}
