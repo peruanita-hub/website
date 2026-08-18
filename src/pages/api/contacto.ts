@@ -1,8 +1,8 @@
 /**
- * Cloudflare Pages Function: recibe los formularios de Distribuidores y
- * Postulación, y los reenvía por correo con Resend.
+ * Recibe los formularios de Distribuidores y Postulación, y los reenvía
+ * por correo con Resend.
  *
- * Variables de entorno requeridas en Cloudflare Pages:
+ * Variables de entorno requeridas (Vercel → Settings → Environment Variables):
  *   RESEND_API_KEY   clave de API de Resend
  *   CONTACTO_DESTINO destino (por defecto comercial@peruanita.com)
  *   CONTACTO_REMITE  remitente verificado en Resend
@@ -10,12 +10,9 @@
  * Sin RESEND_API_KEY el endpoint responde 503: falla de forma visible en
  * vez de tragarse silenciosamente las solicitudes de clientes.
  */
+import type { APIRoute } from 'astro';
 
-interface Env {
-  RESEND_API_KEY?: string;
-  CONTACTO_DESTINO?: string;
-  CONTACTO_REMITE?: string;
-}
+export const prerender = false;
 
 /**
  * Los campos replican los del formulario de Ninja Forms que tenía el
@@ -65,7 +62,7 @@ function redirigir(url: URL, estado: 'ok' | 'error'): Response {
   return Response.redirect(destino.toString(), 303);
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const POST: APIRoute = async ({ request }) => {
   const url = new URL(request.url);
 
   let form: FormData;
@@ -86,7 +83,8 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     return new Response('Formulario desconocido', { status: 400 });
   }
 
-  if (!env.RESEND_API_KEY) {
+  const RESEND_API_KEY = import.meta.env.RESEND_API_KEY;
+  if (!RESEND_API_KEY) {
     return new Response('El envío de correo no está configurado en este entorno.', { status: 503 });
   }
 
@@ -120,12 +118,12 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   const respuesta = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      Authorization: `Bearer ${RESEND_API_KEY}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: env.CONTACTO_REMITE ?? 'web@peruanita.com',
-      to: env.CONTACTO_DESTINO ?? 'comercial@peruanita.com',
+      from: import.meta.env.CONTACTO_REMITE ?? 'web@peruanita.com',
+      to: import.meta.env.CONTACTO_DESTINO ?? 'comercial@peruanita.com',
       reply_to: String(form.get('email') ?? '') || undefined,
       subject: definicion.titulo,
       html: `<h2>${escapeHtml(definicion.titulo)}</h2><table>${filas}</table>${listaAdjuntos}`,

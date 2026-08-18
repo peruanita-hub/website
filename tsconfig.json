@@ -4,9 +4,7 @@
     ".astro/types.d.ts",
     "**/*"
   ],
-  "//": "functions/ corre en el runtime de Cloudflare Workers, no en Astro: tiene su propio tsconfig.",
   "exclude": [
-    "dist",
-    "functions"
+    "dist"
   ]
 }

@@ -25,3 +25,4 @@ pnpm-debug.log*
 
 # capturas de pantalla de referencia (no son assets del sitio)
 Captura*.png
+.vercel
