@@ -62,6 +62,27 @@ export interface Page {
   };
 }
 
+export interface Post {
+  id: number;
+  slug: string;
+  date: string;
+  title: WPRendered;
+  content: WPRendered;
+  excerpt: WPRendered;
+  featured_media: number;
+  _embedded?: {
+    'wp:featuredmedia'?: WPMedia[];
+  };
+}
+
+/** El excerpt de WP trae etiquetas y el enlace "[...]"; esto lo deja en texto plano para meta description. */
+export function excerptTexto(excerpt: WPRendered): string {
+  return excerpt.rendered
+    .replace(/<[^>]+>/g, '')
+    .replace(/\[&hellip;\]|\[…\]/g, '')
+    .trim();
+}
+
 /**
  * El origen falla intermitentemente (404 o HTML en vez de JSON) durante
  * ventanas de varios segundos, sin patrón claro de IP/cliente — se
@@ -147,6 +168,14 @@ export function getPages() {
 
 export function getPageBySlug(slug: string) {
   return wpFetch<Page[]>(`/pages?slug=${slug}&_embed`).then((r) => r[0]);
+}
+
+export function getPosts() {
+  return wpFetch<Post[]>('/posts?per_page=100&_embed');
+}
+
+export function getPostBySlug(slug: string) {
+  return wpFetch<Post[]>(`/posts?slug=${slug}&_embed`).then((r) => r[0]);
 }
 
 /** Los campos repeater se guardan como JSON en meta; esto los tipa de vuelta. */

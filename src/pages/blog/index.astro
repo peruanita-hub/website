@@ -1,0 +1,69 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import SiteFooter from '../../components/SiteFooter.astro';
+import PageHero from '../../components/PageHero.astro';
+import Watermark from '../../components/Watermark.astro';
+import Card from '../../components/ui/Card.astro';
+import { getPosts, getFeaturedImage, excerptTexto } from '../../lib/wp';
+
+const posts = (await getPosts()).sort(
+  (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+);
+
+const formateador = new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'long', year: 'numeric' });
+---
+
+<BaseLayout
+  title="Blog"
+  breadcrumbs={[{ label: 'Blog', href: '/blog/' }]}
+  description="Nutrición, cereales andinos y consejos de preparación: notas de Peruanita E.I.R.L. sobre avena, quinua, kiwicha, cañihua y más."
+>
+  <SiteHeader slot="header" />
+
+  <PageHero title="Blog" bg={null} breadcrumbs={[{ label: 'Blog', href: '/blog/' }]} />
+
+  <section class="relative overflow-hidden py-20 md:py-24">
+    <Watermark side="right" motif="trigo" />
+    <div class="relative mx-auto max-w-6xl px-6">
+      {posts.length === 0 ? (
+        <p class="text-center text-muted-foreground">Pronto vamos a publicar los primeros artículos.</p>
+      ) : (
+        <ul class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post) => {
+            const image = getFeaturedImage(post);
+            return (
+              <li class="h-full">
+                <Card href={`/blog/${post.slug}/`} hoverable class="group flex h-full flex-col overflow-hidden p-0">
+                  {image && (
+                    <img
+                      src={image.source_url}
+                      alt={image.alt_text}
+                      width={image.media_details?.width}
+                      height={image.media_details?.height}
+                      loading="lazy"
+                      class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  )}
+                  <div class="flex flex-1 flex-col p-6">
+                    <p class="text-xs uppercase tracking-wider text-muted-foreground/70">
+                      {formateador.format(new Date(post.date))}
+                    </p>
+                    <h2 class="mt-2 font-display text-lg text-foreground group-hover:text-primary">
+                      {post.title.rendered}
+                    </h2>
+                    <p class="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                      {excerptTexto(post.excerpt)}
+                    </p>
+                  </div>
+                </Card>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  </section>
+
+  <SiteFooter slot="footer" />
+</BaseLayout>
