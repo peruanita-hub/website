@@ -34,6 +34,7 @@ const crumbs = [
 const ingredientes = parseJsonMeta<string[]>(producto.meta.ingredientes, []);
 const beneficios = parseJsonMeta<string[]>(producto.meta.beneficios, []);
 const presentaciones = parseJsonMeta<{ gramaje: string }[]>(producto.meta.presentaciones, []);
+const faq = parseJsonMeta<{ pregunta: string; respuesta: string }[]>(producto.meta.faq, []);
 const image = getFeaturedImage(producto);
 
 const productSchema = {
@@ -45,6 +46,19 @@ const productSchema = {
   ...(image && { image: image.source_url }),
   brand: { '@type': 'Brand', name: 'Peruanita' },
 };
+
+const faqSchema =
+  faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map((f) => ({
+          '@type': 'Question',
+          name: f.pregunta,
+          acceptedAnswer: { '@type': 'Answer', text: f.respuesta },
+        })),
+      }
+    : null;
 ---
 
 <BaseLayout
@@ -54,6 +68,9 @@ const productSchema = {
   breadcrumbs={crumbs}
 >
   <script slot="head" is:inline type="application/ld+json" set:html={JSON.stringify(productSchema)} />
+  {faqSchema && (
+    <script slot="head" is:inline type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  )}
 
   <SiteHeader slot="header" />
 
@@ -147,6 +164,35 @@ const productSchema = {
                 </li>
               ))}
             </ul>
+          </Reveal>
+        )}
+
+        {producto.meta.modo_preparacion && (
+          <Reveal as="section" class="mt-10">
+            <h2 class="flex items-center gap-2.5 font-display text-lg text-foreground">
+              <Icon name="tazon" class="text-primary" />
+              Modo de preparación
+            </h2>
+            <p class="mt-4 text-sm leading-relaxed text-muted-foreground">
+              {producto.meta.modo_preparacion}
+            </p>
+          </Reveal>
+        )}
+
+        {faq.length > 0 && (
+          <Reveal as="section" class="mt-10">
+            <h2 class="flex items-center gap-2.5 font-display text-lg text-foreground">
+              <Icon name="list" class="text-primary" />
+              Preguntas frecuentes
+            </h2>
+            <dl class="mt-4 space-y-5">
+              {faq.map((f) => (
+                <div>
+                  <dt class="font-semibold text-foreground">{f.pregunta}</dt>
+                  <dd class="mt-1.5 text-sm leading-relaxed text-muted-foreground">{f.respuesta}</dd>
+                </div>
+              ))}
+            </dl>
           </Reveal>
         )}
 
