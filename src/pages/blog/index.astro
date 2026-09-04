@@ -21,7 +21,7 @@ const formateador = new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'l
 >
   <SiteHeader slot="header" />
 
-  <PageHero title="Blog" bg={null} breadcrumbs={[{ label: 'Blog', href: '/blog/' }]} />
+  <PageHero title="Blog" />
 
   <section class="relative overflow-hidden py-20 md:py-24">
     <Watermark side="right" motif="trigo" />
@@ -42,6 +42,7 @@ const formateador = new Intl.DateTimeFormat('es-PE', { day: 'numeric', month: 'l
                       width={image.media_details?.width}
                       height={image.media_details?.height}
                       loading="lazy"
+                      transition:name={`blog-img-${post.slug}`}
                       class="h-48 w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   )}

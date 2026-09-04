@@ -5,6 +5,7 @@ import SiteFooter from '../../components/SiteFooter.astro';
 import Breadcrumb from '../../components/ui/Breadcrumb.astro';
 import Reveal from '../../components/ui/Reveal.astro';
 import Subrayado from '../../components/ui/Subrayado.astro';
+import Watermark from '../../components/Watermark.astro';
 import { getPosts, getFeaturedImage, excerptTexto } from '../../lib/wp';
 
 export async function getStaticPaths() {
@@ -55,7 +56,10 @@ const articleSchema = {
     </div>
   </div>
 
-  <article class="mx-auto max-w-3xl px-6 py-14 md:py-20">
+  <article class="relative overflow-hidden">
+    <Watermark side="right" />
+
+    <div class="relative mx-auto max-w-3xl px-6 py-14 md:py-20">
     <Reveal>
       <p class="text-xs uppercase tracking-wider text-muted-foreground/70">
         {formateador.format(new Date(post.date))}
@@ -74,6 +78,7 @@ const articleSchema = {
           height={image.media_details?.height}
           loading="eager"
           fetchpriority="high"
+          transition:name={`blog-img-${post.slug}`}
           class="mt-8 h-auto w-full object-cover"
         />
       </Reveal>
@@ -82,6 +87,7 @@ const articleSchema = {
     <Reveal delay={140} class="mt-10">
       <div class="prose" set:html={post.content.rendered} />
     </Reveal>
+    </div>
   </article>
 
   <SiteFooter slot="footer" />
