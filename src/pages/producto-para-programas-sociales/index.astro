@@ -1,0 +1,7 @@
+---
+// URL vieja de la WordPress anterior, con tráfico real ya indexado
+// (237 impresiones / 7 clics en Search Console). La config `redirects`
+// de Astro no matcheaba la barra final; una página real sí.
+export const prerender = false;
+return Astro.redirect('/programas-sociales/', 301);
+---
