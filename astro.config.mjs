@@ -16,4 +16,23 @@ export default defineConfig({
   },
 
   adapter: vercel(),
+
+  /*
+    Los redirects de vercel.json no se estaban aplicando: el adaptador
+    de Vercel genera su propio config de rutas y no los mezcla. Estos sí
+    funcionan porque Astro los resuelve a través del propio adaptador.
+    URLs viejas de la WordPress anterior que cambiaron de estructura.
+  */
+  redirects: {
+    '/producto-para-programas-sociales': '/programas-sociales/',
+    '/producto-para-programas-sociales/': '/programas-sociales/',
+    '/trabajo': '/trabaja-con-nosotros/',
+    '/trabajo/': '/trabaja-con-nosotros/',
+    '/productos-comerciales/harina-de-maca-2': '/productos-comerciales/harina-de-maca/',
+    '/productos-comerciales/harina-de-maca-2/': '/productos-comerciales/harina-de-maca/',
+    '/productos-comerciales/harina-de-quinua-2': '/productos-comerciales/harina-de-quinua/',
+    '/productos-comerciales/harina-de-quinua-2/': '/productos-comerciales/harina-de-quinua/',
+    '/maintenance': '/',
+    '/maintenance/': '/',
+  },
 });
